@@ -5,17 +5,17 @@ import base64
 
 # --- ΡΥΘΜΙΣΕΙΣ ΣΕΛΙΔΑΣ ---
 st.set_page_config(
-    page_title="Greece House Price Index (GHPI)",
+    page_title="Δείκτης Τιμών Ακινήτων Ελλάδας (GHPI)",
     page_icon="🏛️",
     layout="wide"
 )
 
-# --- CSS STYLE (THEME AWARE & CUSTOM BUTTONS) ---
+# --- CSS STYLE (THEME AWARE) ---
 st.markdown("""
 <style>
-    /* Γενικά Κείμενα - Επαναφορά αρχικών μεγεθών */
+    /* Γενικά Κείμενα */
     .main-title { 
-        font-size: 3rem; 
+        font-size: 2.8rem; /* Ελαφρώς μικρότερο για να χωράει άνετα το ελληνικό κείμενο */
         color: var(--text-color); 
         font-weight: 800; 
         margin-bottom: 0; 
@@ -25,7 +25,7 @@ st.markdown("""
         font-size: 1.5rem; 
         color: #0088C3; /* Brand Blue */
         font-weight: 600; 
-        margin-top: 0; 
+        margin-top: 5px; 
         margin-bottom: 10px; 
     }
     .intro { 
@@ -117,8 +117,8 @@ lang = 'el' if lang_selection == "🇬🇷 GR" else 'en'
 # --- ΛΕΞΙΚΟ ΜΕΤΑΦΡΑΣΕΩΝ ---
 content = {
     'el': {
-        'title': 'Greece House Price Index (GHPI)', # Επαναφορά αρχικού τίτλου
-        'subtitle': 'by Giakoumakis Real Estate', # Επαναφορά αρχικού υπότιτλου
+        'title': 'Δείκτης Τιμών Ακινήτων Ελλάδας (GHPI)', # ΝΕΟΣ ΕΛΛΗΝΙΚΟΣ ΤΙΤΛΟΣ
+        'subtitle': 'από Γιακουμάκης Ακίνητα',          # ΝΕΟΣ ΕΛΛΗΝΙΚΟΣ ΥΠΟΤΙΤΛΟΣ
         'intro_text': 'Ο επίσημος σύνθετος δείκτης για την πορεία της Ελληνικής Κτηματαγοράς.',
         'tab_data': '📊 Δεδομένα & Στατιστικά',
         'tab_methodology': '📘 Μεθοδολογία & Πηγές',
@@ -166,8 +166,8 @@ content = {
         'footer': '© 2025 Giakoumakis Real Estate. All rights reserved.'
     },
     'en': {
-        'title': 'Greece House Price Index (GHPI)', # Επαναφορά αρχικού τίτλου
-        'subtitle': 'by Giakoumakis Real Estate', # Επαναφορά αρχικού υπότιτλου
+        'title': 'Greece House Price Index (GHPI)',
+        'subtitle': 'by Giakoumakis Real Estate',
         'intro_text': 'The official composite index tracking the Greek Real Estate Market.',
         'tab_data': '📊 Data & Statistics',
         'tab_methodology': '📘 Methodology & Sources',
@@ -218,7 +218,7 @@ content = {
 
 text = content[lang]
 
-# --- MAIN HEADER (ΔΙΟΡΘΩΜΕΝΟ) ---
+# --- MAIN HEADER (LOGO + TEXT) ---
 with top_col1:
     # 1. Φόρτωση logo
     logo_html = ""
@@ -227,12 +227,12 @@ with top_col1:
         with open("logo.png", "rb") as f:
             data = f.read()
         encoded_img = base64.b64encode(data).decode()
-        # Ρύθμιση ύψους στα 110px για ισορροπία με τον μεγάλο τίτλο
+        # Ρύθμιση ύψους στα 110px για να φαίνεται ωραίο
         logo_html = f'<img src="data:image/png;base64,{encoded_img}" style="height: 110px; margin-right: 25px; align-self: center;">'
     except FileNotFoundError:
         pass
 
-    # 2. Flex container με τους αρχικούς τίτλους
+    # 2. Flex container
     st.markdown(f"""
     <div style="display: flex; flex-direction: row; align-items: center;">
         {logo_html}
