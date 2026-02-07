@@ -10,12 +10,12 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- CSS STYLE (THEME AWARE) ---
+# --- CSS STYLE (MOBILE RESPONSIVE) ---
 st.markdown("""
 <style>
     /* Γενικά Κείμενα */
     .main-title { 
-        font-size: 2.8rem; /* Ελαφρώς μικρότερο για να χωράει άνετα το ελληνικό κείμενο */
+        font-size: 2.8rem; 
         color: var(--text-color); 
         font-weight: 800; 
         margin-bottom: 0; 
@@ -23,7 +23,7 @@ st.markdown("""
     }
     .subtitle { 
         font-size: 1.5rem; 
-        color: #0088C3; /* Brand Blue */
+        color: #0088C3; 
         font-weight: 600; 
         margin-top: 5px; 
         margin-bottom: 10px; 
@@ -37,18 +37,75 @@ st.markdown("""
         margin-top: 20px;
     }
     
+    /* Header Container Styling - Desktop Default */
+    .header-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+    }
+    
+    .logo-img {
+        height: 110px;
+        margin-right: 25px;
+        align-self: center;
+    }
+    
+    .title-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: left;
+    }
+
+    /* --- MOBILE RESPONSIVENESS (Magic happens here) --- */
+    @media only screen and (max-width: 768px) {
+        .header-container {
+            flex-direction: column; /* Στο κινητό γίνονται κάθετα */
+            align-items: center;    /* Κεντράρισμα */
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .logo-img {
+            height: 90px;        /* Λίγο μικρότερο λογότυπο */
+            margin-right: 0;     /* Αφαίρεση δεξιού περιθωρίου */
+            margin-bottom: 15px; /* Προσθήκη κενού από κάτω */
+        }
+        
+        .title-container {
+            text-align: center;  /* Κεντράρισμα κειμένου */
+            align-items: center;
+        }
+        
+        .main-title {
+            font-size: 1.8rem;   /* Μικρότερη γραμματοσειρά τίτλου */
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;   /* Μικρότερη γραμματοσειρά υποτίτλου */
+        }
+    }
+    
     /* Language Toggle Styling */
     div.stRadio > div[role="radiogroup"] {
         flex-direction: row;
         justify-content: flex-end;
     }
+    /* Στο κινητό φέρνουμε το language switcher στο κέντρο */
+    @media only screen and (max-width: 768px) {
+        div.stRadio > div[role="radiogroup"] {
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+    }
     
-    /* Boxes */
+    /* Boxes & Cards */
     .source-box { 
         background-color: var(--secondary-background-color); 
         padding: 15px; 
         border-radius: 8px; 
-        border-left: 5px solid #003B71; /* Brand Dark Blue */
+        border-left: 5px solid #003B71; 
         margin-bottom: 10px;
         border: 1px solid rgba(128, 128, 128, 0.2);
     }
@@ -102,6 +159,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- HEADER LAYOUT (LOGO + TITLE & LANGUAGE SWITCHER) ---
+# Στα κινητά το st.columns στοιβάζεται κάθετα (πρώτα το col1, μετά το col2)
+# Αλλάζουμε λίγο τη λογική για να φαίνονται ωραία
 top_col1, top_col2 = st.columns([4, 1])
 
 with top_col2:
@@ -117,8 +176,8 @@ lang = 'el' if lang_selection == "🇬🇷 GR" else 'en'
 # --- ΛΕΞΙΚΟ ΜΕΤΑΦΡΑΣΕΩΝ ---
 content = {
     'el': {
-        'title': 'Δείκτης Τιμών Ακινήτων Ελλάδας (GHPI)', # ΝΕΟΣ ΕΛΛΗΝΙΚΟΣ ΤΙΤΛΟΣ
-        'subtitle': 'από Γιακουμάκης Ακίνητα',          # ΝΕΟΣ ΕΛΛΗΝΙΚΟΣ ΥΠΟΤΙΤΛΟΣ
+        'title': 'Δείκτης Τιμών Ακινήτων Ελλάδας (GHPI)',
+        'subtitle': 'από Γιακουμάκης Ακίνητα',
         'intro_text': 'Ο επίσημος σύνθετος δείκτης για την πορεία της Ελληνικής Κτηματαγοράς.',
         'tab_data': '📊 Δεδομένα & Στατιστικά',
         'tab_methodology': '📘 Μεθοδολογία & Πηγές',
@@ -218,32 +277,30 @@ content = {
 
 text = content[lang]
 
-# --- MAIN HEADER (LOGO + TEXT) ---
+# --- MAIN HEADER (MOBILE OPTIMIZED) ---
 with top_col1:
-    # 1. Φόρτωση logo
     logo_html = ""
     try:
-        # ΠΡΟΣΟΧΗ: Το αρχείο πρέπει να ονομάζεται 'logo.png' στο GitHub
         with open("logo.png", "rb") as f:
             data = f.read()
         encoded_img = base64.b64encode(data).decode()
-        # Ρύθμιση ύψους στα 110px για να φαίνεται ωραίο
-        logo_html = f'<img src="data:image/png;base64,{encoded_img}" style="height: 110px; margin-right: 25px; align-self: center;">'
+        # Χρήση class 'logo-img' που ελέγχεται από το CSS
+        logo_html = f'<img src="data:image/png;base64,{encoded_img}" class="logo-img">'
     except FileNotFoundError:
         pass
 
-    # 2. Flex container
+    # Χρήση των CSS classes που ορίσαμε (header-container, title-container)
     st.markdown(f"""
-    <div style="display: flex; flex-direction: row; align-items: center;">
+    <div class="header-container">
         {logo_html}
-        <div style="display: flex; flex-direction: column; justify-content: center;">
+        <div class="title-container">
             <div class="main-title">{text["title"]}</div>
             <div class="subtitle">{text["subtitle"]}</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-# Intro text κάτω από το header
+# Intro text
 st.markdown(f'<div class="intro">{text["intro_text"]}</div>', unsafe_allow_html=True)
 
 # --- DATA ENGINE ---
