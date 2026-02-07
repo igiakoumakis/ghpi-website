@@ -18,7 +18,7 @@ content = {
         'subtitle': 'by Giakoumakis Real Estate',
         'intro_text': 'Ο επίσημος σύνθετος δείκτης για την πορεία της Ελληνικής Κτηματαγοράς.',
         'tab_data': '📊 Δεδομένα & Τάσεις',
-        'tab_methodology': '📘 Μεθοδολογία & Πηγές',  # Updated Title
+        'tab_methodology': '📘 Μεθοδολογία & Πηγές',
         'chart_compare_title': 'Σύγκριση Πηγών: GHPI vs Επιμέρους Δείκτες',
         'chart_yoy_title': 'Ετήσια Ποσοστιαία Μεταβολή (%)',
         'kpi_current': 'Τρέχουσα Τιμή GHPI (2025)',
@@ -42,7 +42,7 @@ content = {
         'subtitle': 'by Giakoumakis Real Estate',
         'intro_text': 'The official composite index tracking the Greek Real Estate Market.',
         'tab_data': '📊 Data & Trends',
-        'tab_methodology': '📘 Methodology & Sources', # Updated Title
+        'tab_methodology': '📘 Methodology & Sources',
         'chart_compare_title': 'Source Comparison: GHPI vs Sub-Indices',
         'chart_yoy_title': 'Annual Percentage Change (%)',
         'kpi_current': 'Current GHPI Value (2025)',
@@ -133,14 +133,12 @@ with tab1:
         hovermode="x unified", 
         height=450, 
         legend=dict(orientation="h", y=1.1),
-        margin=dict(l=20, r=20, t=20, b=20)
+        margin=dict(l=20, r=20, t=20, b=20),
+        dragmode=False  # <--- ΠΡΟΣΘΗΚΗ: Απενεργοποίηση Zoom/Pan για mobile scroll
     )
-    st.plotly_chart(fig_comp, use_container_width=True)
-dragmode=False, # Απενεργοποίηση zoom για να μην κολλάει το scroll
-        hovermode="x unified"
-    )
-    # Απόκρυψη του ModeBar (εργαλεία zoom κλπ)
+    # ΠΡΟΣΘΗΚΗ: config για απόκρυψη toolbar
     st.plotly_chart(fig_comp, use_container_width=True, config={'displayModeBar': False})
+
     # 3. CHART: ΕΤΗΣΙΑ ΜΕΤΑΒΟΛΗ
     st.subheader(text['chart_yoy_title'])
     colors = ['#EF4444' if x < 0 else '#10B981' for x in df['YoY_Change']]
@@ -152,7 +150,13 @@ dragmode=False, # Απενεργοποίηση zoom για να μην κολλ�
         text=df['YoY_Change'].apply(lambda x: f'{x:.1f}%'),
         textposition='outside'
     ))
-    fig_bar.update_layout(height=350, showlegend=False, margin=dict(l=20, r=20, t=20, b=20))
+    fig_bar.update_layout(
+        height=350, 
+        showlegend=False, 
+        margin=dict(l=20, r=20, t=20, b=20),
+        dragmode=False  # <--- ΠΡΟΣΘΗΚΗ: Απενεργοποίηση Zoom/Pan για mobile scroll
+    )
+    # ΠΡΟΣΘΗΚΗ: config για απόκρυψη toolbar
     st.plotly_chart(fig_bar, use_container_width=True, config={'displayModeBar': False})
     
     with st.expander("📂 View Raw Data / Προβολή Πίνακα Δεδομένων"):
