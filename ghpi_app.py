@@ -1,64 +1,58 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
-import plotly.express as px
 
-# --- ΡΥΘΜΙΣΕΙΣ ΣΕΛΙΔΑΣ ---
+# --- ΡΥΘΜΙΣΕΙΣ ΣΕΛΙΔΑΣ (MOBILE OPTIMIZED) ---
 st.set_page_config(
-    page_title="Greece House Price Index (GHPI)",
+    page_title="GHPI Index",
     page_icon="🏛️",
-    layout="wide"
+    layout="centered", # Αλλαγή σε centered για να εστιάζει καλύτερα σε κινητά
+    initial_sidebar_state="collapsed" # Κλειστή sidebar για περισσότερο χώρο
 )
 
 # --- ΛΕΞΙΚΟ ΜΕΤΑΦΡΑΣΕΩΝ ---
 content = {
     'el': {
         'sidebar_lang': 'Γλώσσα / Language',
-        'title': 'Greece House Price Index (GHPI)',
+        'title': 'GHPI Index', # Πιο σύντομος τίτλος για mobile
         'subtitle': 'by Giakoumakis Real Estate',
         'intro_text': 'Ο επίσημος σύνθετος δείκτης για την πορεία της Ελληνικής Κτηματαγοράς.',
-        'tab_data': '📊 Δεδομένα & Τάσεις',
-        'tab_methodology': '📘 Μεθοδολογία & Πηγές',  # Updated Title
-        'chart_compare_title': 'Σύγκριση Πηγών: GHPI vs Επιμέρους Δείκτες',
-        'chart_yoy_title': 'Ετήσια Ποσοστιαία Μεταβολή (%)',
-        'kpi_current': 'Τρέχουσα Τιμή GHPI (2025)',
-        'method_title': 'Μεθοδολογία Υπολογισμού',
-        'method_intro': """
-            Ο δείκτης **GHPI** σχεδιάστηκε από την **Giakoumakis Real Estate** για να προσφέρει μια 
-            ολιστική εικόνα της αγοράς, σταθμίζοντας τρεις κρίσιμους παράγοντες:
-        """,
-        'method_p1': '1. Τραπεζικές Εκτιμήσεις (50%)',
-        'method_p2': '2. Τάσεις Αγοράς (30%)',
-        'method_p3': '3. Κόστος Κατασκευής (20%)',
-        'sources_title': '📚 Πηγές Δεδομένων',
-        'source_1': '🏦 **Τράπεζα της Ελλάδος (Bank of Greece):** Δείκτες Τιμών Οικιστικών Ακινήτων (Πίνακας ΙΙ.1 - Στοιχεία από εκτιμήσεις τραπεζών).',
-        'source_2': '📈 **Spitogatos Network (SPI):** Spitogatos Property Index. Βάση δεδομένων ζητούμενων τιμών από αγγελίες ακινήτων.',
-        'source_3': '🏗️ **ΕΛΣΤΑΤ (Hellenic Statistical Authority):** Δείκτης Κόστους Υλικών Νέων Κτιρίων Κατοικιών.',
-        'footer': '© 2025 Giakoumakis Real Estate. All rights reserved.'
+        'tab_data': '📊 Δεδομένα',
+        'tab_methodology': '📘 Μεθοδολογία',
+        'chart_compare_title': 'Σύγκριση Πηγών & GHPI',
+        'chart_yoy_title': 'Ετήσια Μεταβολή (%)',
+        'kpi_current': 'Τρέχουσα Τιμή (2025)',
+        'method_title': 'Μεθοδολογία',
+        'method_intro': 'Ο GHPI σταθμίζει τρεις κρίσιμους παράγοντες:',
+        'method_p1': '1. Τράπεζες (50%)',
+        'method_p2': '2. Αγορά (30%)',
+        'method_p3': '3. Κόστος (20%)',
+        'sources_title': '📚 Πηγές',
+        'source_1': '🏦 **ΤτΕ:** Εκτιμήσεις Τραπεζών.',
+        'source_2': '📈 **SPI:** Ζητούμενες Τιμές.',
+        'source_3': '🏗️ **ΕΛΣΤΑΤ:** Κόστος Υλικών.',
+        'footer': '© 2025 Giakoumakis Real Estate.'
     },
     'en': {
         'sidebar_lang': 'Language / Γλώσσα',
-        'title': 'Greece House Price Index (GHPI)',
+        'title': 'GHPI Index',
         'subtitle': 'by Giakoumakis Real Estate',
         'intro_text': 'The official composite index tracking the Greek Real Estate Market.',
-        'tab_data': '📊 Data & Trends',
-        'tab_methodology': '📘 Methodology & Sources', # Updated Title
-        'chart_compare_title': 'Source Comparison: GHPI vs Sub-Indices',
-        'chart_yoy_title': 'Annual Percentage Change (%)',
-        'kpi_current': 'Current GHPI Value (2025)',
-        'method_title': 'Calculation Methodology',
-        'method_intro': """
-            The **GHPI** was designed by **Giakoumakis Real Estate** to provide a 
-            holistic view of the market, weighting three critical factors:
-        """,
-        'method_p1': '1. Bank Valuations (50%)',
-        'method_p2': '2. Market Trends (30%)',
-        'method_p3': '3. Construction Cost (20%)',
-        'sources_title': '📚 Data Sources',
-        'source_1': '🏦 **Bank of Greece:** Index of Apartment Prices (Table II.1 - Data collected from bank valuations).',
-        'source_2': '📈 **Spitogatos Network (SPI):** Spitogatos Property Index. Database of asking prices from property listings.',
-        'source_3': '🏗️ **ELSTAT (Hellenic Statistical Authority):** Material Costs Index for New Residential Buildings.',
-        'footer': '© 2025 Giakoumakis Real Estate. All rights reserved.'
+        'tab_data': '📊 Data',
+        'tab_methodology': '📘 Methodology',
+        'chart_compare_title': 'Source Comparison',
+        'chart_yoy_title': 'Yearly Change (%)',
+        'kpi_current': 'Current Value (2025)',
+        'method_title': 'Methodology',
+        'method_intro': 'GHPI weights three critical factors:',
+        'method_p1': '1. Banks (50%)',
+        'method_p2': '2. Market (30%)',
+        'method_p3': '3. Costs (20%)',
+        'sources_title': '📚 Sources',
+        'source_1': '🏦 **BoG:** Bank Valuations.',
+        'source_2': '📈 **SPI:** Asking Prices.',
+        'source_3': '🏗️ **ELSTAT:** Material Costs.',
+        'footer': '© 2025 Giakoumakis Real Estate.'
     }
 }
 
@@ -67,17 +61,20 @@ lang_option = st.sidebar.radio("🌍 Language", ('Ελληνικά', 'English'))
 lang = 'el' if lang_option == 'Ελληνικά' else 'en'
 text = content[lang]
 
-# --- STYLE ---
+# --- CSS ΓΙΑ ΚΙΝΗΤΑ (TOUCH FRIENDLY) ---
 st.markdown("""
 <style>
-    .main-title { font-size: 3rem; color: #0F172A; font-weight: 800; margin-bottom: 0; line-height: 1.2;}
-    .subtitle { font-size: 1.5rem; color: #3B82F6; font-weight: 600; margin-top: 0; margin-bottom: 10px; }
-    .intro { font-size: 1.1rem; color: #64748B; margin-bottom: 30px; font-style: italic;}
-    .source-box { background-color: #f8fafc; padding: 15px; border-radius: 8px; border-left: 5px solid #3B82F6; margin-bottom: 10px;}
+    .main-title { font-size: 2.2rem; color: #0F172A; font-weight: 800; margin-bottom: 0; line-height: 1.2; text-align: center;}
+    .subtitle { font-size: 1.0rem; color: #3B82F6; font-weight: 600; margin-top: 5px; margin-bottom: 15px; text-align: center;}
+    .intro { font-size: 0.95rem; color: #64748B; margin-bottom: 20px; font-style: italic; text-align: center;}
+    /* Μεγαλύτερα Tabs για εύκολο πάτημα */
+    .stTabs [data-baseweb="tab"] { font-size: 1.1rem; padding: 10px 20px; }
+    /* Πιο καθαροί πίνακες */
+    .stDataFrame { font-size: 0.9rem; }
 </style>
 """, unsafe_allow_html=True)
 
-# --- HEADER (BRANDING) ---
+# --- HEADER ---
 st.markdown(f'<div class="main-title">{text["title"]}</div>', unsafe_allow_html=True)
 st.markdown(f'<div class="subtitle">{text["subtitle"]}</div>', unsafe_allow_html=True)
 st.markdown(f'<div class="intro">{text["intro_text"]}</div>', unsafe_allow_html=True)
@@ -101,89 +98,92 @@ tab1, tab2 = st.tabs([f"{text['tab_data']}", f"{text['tab_methodology']}"])
 
 # === TAB 1: DATA & CHARTS ===
 with tab1:
-    # 1. KPIs
+    # 1. KPI (Κεντραρισμένο)
     latest = df.iloc[-1]
     prev = df.iloc[-2]
     diff = latest['GHPI'] - prev['GHPI']
     
-    col_kpi1, col_kpi2, col_kpi3 = st.columns([1,2,1])
-    with col_kpi2:
+    # Χρήση container για καλύτερο alignment
+    with st.container():
         st.metric(label=text['kpi_current'], value=f"{latest['GHPI']}", delta=f"{diff:.1f} ({latest['YoY_Change']:.1f}%)")
     
     st.divider()
 
-    # 2. CHART: ΟΛΟΙ ΟΙ ΔΕΙΚΤΕΣ ΜΑΖΙ
+    # 2. CHART: COMPARISON (MOBILE OPTIMIZED)
     st.subheader(text['chart_compare_title'])
     
     fig_comp = go.Figure()
     
-    # Οι επιμέρους δείκτες
-    fig_comp.add_trace(go.Scatter(x=df['Year'], y=df['BoG_Index'], name='Bank of Greece (Valuations)', 
-                                  line=dict(dash='dot', width=1.5, color='blue')))
-    fig_comp.add_trace(go.Scatter(x=df['Year'], y=df['SPI_Index'], name='Market Asking Prices', 
-                                  line=dict(dash='dot', width=1.5, color='red')))
-    fig_comp.add_trace(go.Scatter(x=df['Year'], y=df['ELSTAT_Cost'], name='Construction Costs', 
-                                  line=dict(dash='dot', width=1.5, color='green')))
+    # Λεπτές γραμμές για τα επιμέρους
+    fig_comp.add_trace(go.Scatter(x=df['Year'], y=df['BoG_Index'], name='Banks', line=dict(dash='dot', width=1, color='blue')))
+    fig_comp.add_trace(go.Scatter(x=df['Year'], y=df['SPI_Index'], name='Market', line=dict(dash='dot', width=1, color='red')))
+    fig_comp.add_trace(go.Scatter(x=df['Year'], y=df['ELSTAT_Cost'], name='Costs', line=dict(dash='dot', width=1, color='green')))
     
-    # Ο GHPI (Έντονη Μαύρη Γραμμή)
-    fig_comp.add_trace(go.Scatter(x=df['Year'], y=df['GHPI'], name='GHPI (Composite)', 
-                                  line=dict(color='black', width=4)))
+    # Παχιά γραμμή για GHPI
+    fig_comp.add_trace(go.Scatter(x=df['Year'], y=df['GHPI'], name='GHPI', line=dict(color='black', width=3)))
 
+    # Ρυθμίσεις για κινητά (Legend κάτω, όχι Zoom)
     fig_comp.update_layout(
-        hovermode="x unified", 
-        height=450, 
-        legend=dict(orientation="h", y=1.1),
-        margin=dict(l=20, r=20, t=20, b=20)
+        height=400,
+        margin=dict(l=10, r=10, t=30, b=0), # Μικρά περιθώρια
+        legend=dict(
+            orientation="h",    # Οριζόντιο υπόμνημα
+            yanchor="bottom", 
+            y=-0.3,             # Κάτω από το γράφημα
+            xanchor="center", 
+            x=0.5
+        ),
+        dragmode=False, # Απενεργοποίηση zoom για να μην κολλάει το scroll
+        hovermode="x unified"
     )
-    st.plotly_chart(fig_comp, use_container_width=True)
+    # Απόκρυψη του ModeBar (εργαλεία zoom κλπ)
+    st.plotly_chart(fig_comp, use_container_width=True, config={'displayModeBar': False})
 
-    # 3. CHART: ΕΤΗΣΙΑ ΜΕΤΑΒΟΛΗ
+    # 3. CHART: YoY CHANGE
     st.subheader(text['chart_yoy_title'])
     colors = ['#EF4444' if x < 0 else '#10B981' for x in df['YoY_Change']]
     
     fig_bar = go.Figure(go.Bar(
         x=df['Year'], 
         y=df['YoY_Change'], 
-        marker_color=colors,
-        text=df['YoY_Change'].apply(lambda x: f'{x:.1f}%'),
-        textposition='outside'
+        marker_color=colors
     ))
-    fig_bar.update_layout(height=350, showlegend=False, margin=dict(l=20, r=20, t=20, b=20))
-    st.plotly_chart(fig_bar, use_container_width=True)
+    fig_bar.update_layout(
+        height=300, 
+        margin=dict(l=10, r=10, t=30, b=30),
+        showlegend=False,
+        dragmode=False
+    )
+    st.plotly_chart(fig_bar, use_container_width=True, config={'displayModeBar': False})
     
-    with st.expander("📂 View Raw Data / Προβολή Πίνακα Δεδομένων"):
-        st.dataframe(df.style.format("{:.1f}"), use_container_width=True)
+    # 4. ΠΙΝΑΚΑΣ (DATA TABLE)
+    with st.expander("📂 " + text['tab_data'] + " (Table)"):
+        # Format των αριθμών για να πιάνουν λίγο χώρο
+        st.dataframe(
+            df.style.format("{:.1f}"), 
+            use_container_width=True, 
+            hide_index=True, # Κρύβουμε την αρίθμηση για χώρο
+            height=300 # Σταθερό ύψος με scroll
+        )
 
-# === TAB 2: METHODOLOGY & SOURCES ===
+# === TAB 2: METHODOLOGY ===
 with tab2:
     st.header(text['method_title'])
     st.markdown(text['method_intro'])
     
-    c1, c2, c3 = st.columns(3)
-    c1.info(f"**{text['method_p1']}**")
-    c2.warning(f"**{text['method_p2']}**")
-    c3.success(f"**{text['method_p3']}**")
+    # Κάθετα Cards αντί για στήλες στα κινητά
+    st.info(f"**{text['method_p1']}**")
+    st.warning(f"**{text['method_p2']}**")
+    st.success(f"**{text['method_p3']}**")
     
-    st.markdown("### The Formula")
-    st.latex(r'''GHPI_t = (0.5 \times I_{Bank}) + (0.3 \times I_{Market}) + (0.2 \times I_{Cost})''')
+    st.markdown("### Formula")
+    st.latex(r'''GHPI = 0.5 I_{Bank} + 0.3 I_{Mkt} + 0.2 I_{Cost}''')
     
-    st.divider()
-    
-    # --- ΠΡΟΣΘΗΚΗ ΠΗΓΩΝ ---
     st.subheader(text['sources_title'])
-    
     st.markdown(f"""
-    <div class="source-box">
-        {text['source_1']}<br><br>
-        {text['source_2']}<br><br>
-        {text['source_3']}
-    </div>
-    """, unsafe_allow_html=True)
-    
-    st.markdown("---")
-    st.markdown("""
-    **Note:** * The base year is technically normalized to align trends.
-    * Data sources are updated quarterly.
+    - {text['source_1']}
+    - {text['source_2']}
+    - {text['source_3']}
     """)
 
 # --- FOOTER ---
