@@ -13,7 +13,7 @@ st.set_page_config(
 # --- CSS STYLE (THEME AWARE & CUSTOM BUTTONS) ---
 st.markdown("""
 <style>
-    /* Γενικά Κείμενα */
+    /* Γενικά Κείμενα - Επαναφορά αρχικών μεγεθών */
     .main-title { 
         font-size: 3rem; 
         color: var(--text-color); 
@@ -23,7 +23,7 @@ st.markdown("""
     }
     .subtitle { 
         font-size: 1.5rem; 
-        color: #0088C3; /* Το γαλάζιο του λογοτύπου */
+        color: #0088C3; /* Brand Blue */
         font-weight: 600; 
         margin-top: 0; 
         margin-bottom: 10px; 
@@ -48,14 +48,14 @@ st.markdown("""
         background-color: var(--secondary-background-color); 
         padding: 15px; 
         border-radius: 8px; 
-        border-left: 5px solid #003B71; /* Το σκούρο μπλε του λογοτύπου */
+        border-left: 5px solid #003B71; /* Brand Dark Blue */
         margin-bottom: 10px;
         border: 1px solid rgba(128, 128, 128, 0.2);
     }
     
-    /* HERO SECTION - Ενημερωμένο με τα χρώματα του brand */
+    /* HERO SECTION */
     .hero-container {
-        background: linear-gradient(135deg, #003B71 0%, #001F3F 100%); /* Σκούρο μπλε gradient */
+        background: linear-gradient(135deg, #003B71 0%, #001F3F 100%);
         color: white; 
         padding: 40px;
         border-radius: 15px;
@@ -117,9 +117,9 @@ lang = 'el' if lang_selection == "🇬🇷 GR" else 'en'
 # --- ΛΕΞΙΚΟ ΜΕΤΑΦΡΑΣΕΩΝ ---
 content = {
     'el': {
-        'title': 'GREECE GHPI',
-        'subtitle': 'HOUSE PRICE INDEX',
-        'intro_text': 'Ο επίσημος σύνθετος δείκτης για την πορεία της Ελληνικής Κτηματαγοράς από την Giakoumakis Real Estate.',
+        'title': 'Greece House Price Index (GHPI)', # Επαναφορά αρχικού τίτλου
+        'subtitle': 'by Giakoumakis Real Estate', # Επαναφορά αρχικού υπότιτλου
+        'intro_text': 'Ο επίσημος σύνθετος δείκτης για την πορεία της Ελληνικής Κτηματαγοράς.',
         'tab_data': '📊 Δεδομένα & Στατιστικά',
         'tab_methodology': '📘 Μεθοδολογία & Πηγές',
         'tab_about': '🏢 Η Εταιρεία',
@@ -166,9 +166,9 @@ content = {
         'footer': '© 2025 Giakoumakis Real Estate. All rights reserved.'
     },
     'en': {
-        'title': 'GREECE GHPI',
-        'subtitle': 'HOUSE PRICE INDEX',
-        'intro_text': 'The official composite index tracking the Greek Real Estate Market by Giakoumakis Real Estate.',
+        'title': 'Greece House Price Index (GHPI)', # Επαναφορά αρχικού τίτλου
+        'subtitle': 'by Giakoumakis Real Estate', # Επαναφορά αρχικού υπότιτλου
+        'intro_text': 'The official composite index tracking the Greek Real Estate Market.',
         'tab_data': '📊 Data & Statistics',
         'tab_methodology': '📘 Methodology & Sources',
         'tab_about': '🏢 About Us',
@@ -218,28 +218,27 @@ content = {
 
 text = content[lang]
 
-# --- MAIN HEADER ---
+# --- MAIN HEADER (ΔΙΟΡΘΩΜΕΝΟ) ---
 with top_col1:
-    # 1. Προσπάθεια φόρτωσης και κωδικοποίησης του logo
+    # 1. Φόρτωση logo
     logo_html = ""
     try:
         # ΠΡΟΣΟΧΗ: Το αρχείο πρέπει να ονομάζεται 'logo.png' στο GitHub
         with open("logo.png", "rb") as f:
             data = f.read()
         encoded_img = base64.b64encode(data).decode()
-        # HTML για το λογότυπο με δεξί περιθώριο
-        logo_html = f'<img src="data:image/png;base64,{encoded_img}" style="height: 100px; margin-right: 25px; align-self: center; margin-top: 5px;">'
+        # Ρύθμιση ύψους στα 110px για ισορροπία με τον μεγάλο τίτλο
+        logo_html = f'<img src="data:image/png;base64,{encoded_img}" style="height: 110px; margin-right: 25px; align-self: center;">'
     except FileNotFoundError:
-        # Αν δεν υπάρχει το αρχείο, απλά δεν δείχνουμε εικόνα
         pass
 
-    # 2. Συνδυασμός εικόνας και κειμένου σε ένα flex container
+    # 2. Flex container με τους αρχικούς τίτλους
     st.markdown(f"""
-    <div style="display: flex; flex-direction: row; align-items: flex-start;">
+    <div style="display: flex; flex-direction: row; align-items: center;">
         {logo_html}
         <div style="display: flex; flex-direction: column; justify-content: center;">
-            <div class="main-title" style="font-size: 2.5rem; line-height: 1.1;">{text["title"]}</div>
-            <div class="subtitle" style="font-size: 1.3rem; margin-top: 5px;">{text["subtitle"]}</div>
+            <div class="main-title">{text["title"]}</div>
+            <div class="subtitle">{text["subtitle"]}</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
