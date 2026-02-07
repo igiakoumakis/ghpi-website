@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
+import base64
 
 # --- ΡΥΘΜΙΣΕΙΣ ΣΕΛΙΔΑΣ ---
 st.set_page_config(
@@ -22,7 +23,7 @@ st.markdown("""
     }
     .subtitle { 
         font-size: 1.5rem; 
-        color: #3B82F6; 
+        color: #0088C3; /* Το γαλάζιο του λογοτύπου */
         font-weight: 600; 
         margin-top: 0; 
         margin-bottom: 10px; 
@@ -33,6 +34,7 @@ st.markdown("""
         opacity: 0.8;
         margin-bottom: 30px; 
         font-style: italic;
+        margin-top: 20px;
     }
     
     /* Language Toggle Styling */
@@ -46,23 +48,23 @@ st.markdown("""
         background-color: var(--secondary-background-color); 
         padding: 15px; 
         border-radius: 8px; 
-        border-left: 5px solid #3B82F6; 
+        border-left: 5px solid #003B71; /* Το σκούρο μπλε του λογοτύπου */
         margin-bottom: 10px;
         border: 1px solid rgba(128, 128, 128, 0.2);
     }
     
-    /* HERO SECTION */
+    /* HERO SECTION - Ενημερωμένο με τα χρώματα του brand */
     .hero-container {
-        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        background: linear-gradient(135deg, #003B71 0%, #001F3F 100%); /* Σκούρο μπλε gradient */
         color: white; 
         padding: 40px;
         border-radius: 15px;
         text-align: center;
         margin-bottom: 40px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        box-shadow: 0 4px 15px rgba(0, 59, 113, 0.3);
     }
     .hero-title { font-size: 1.8rem; font-weight: 800; color: #ffffff; margin-bottom: 10px; }
-    .hero-subtitle { font-size: 1.2rem; font-weight: 600; color: #60A5FA; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px;}
+    .hero-subtitle { font-size: 1.2rem; font-weight: 600; color: #0088C3; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px;}
     .hero-text { font-size: 1.1rem; line-height: 1.6; color: #e2e8f0; max-width: 800px; margin: 0 auto;}
 
     /* SERVICE CARDS */
@@ -78,8 +80,8 @@ st.markdown("""
     }
     .service-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 15px rgba(0,0,0,0.1);
-        border-color: #3B82F6;
+        box-shadow: 0 10px 15px rgba(0, 136, 195, 0.2);
+        border-color: #0088C3;
     }
     .service-icon { font-size: 2.5rem; margin-bottom: 15px; }
     .service-title { font-size: 1.2rem; font-weight: 700; color: var(--text-color); margin-bottom: 10px; }
@@ -94,33 +96,30 @@ st.markdown("""
         box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
     }
     
-    a { color: #3B82F6; text-decoration: none; }
+    a { color: #0088C3; text-decoration: none; }
     a:hover { text-decoration: underline; }
 </style>
 """, unsafe_allow_html=True)
 
-# --- HEADER LAYOUT (LOGO + LANGUAGE SWITCHER) ---
-# Χωρίζουμε την κορυφή σε 2 στήλες: Λογότυπο (Αριστερά) - Γλώσσα (Δεξιά)
+# --- HEADER LAYOUT (LOGO + TITLE & LANGUAGE SWITCHER) ---
 top_col1, top_col2 = st.columns([4, 1])
 
 with top_col2:
-    # Language Switcher ως Segmented Control (Pills) - Πολύ πιο εύχρηστο
     lang_selection = st.radio(
         "Language / Γλώσσα",
         ["🇬🇷 GR", "🇬🇧 EN"],
         horizontal=True,
-        label_visibility="collapsed" # Κρύβει την ετικέτα για καθαρό look
+        label_visibility="collapsed"
     )
 
-# Καθορισμός γλώσσας με βάση την επιλογή
 lang = 'el' if lang_selection == "🇬🇷 GR" else 'en'
 
 # --- ΛΕΞΙΚΟ ΜΕΤΑΦΡΑΣΕΩΝ ---
 content = {
     'el': {
-        'title': 'Greece House Price Index (GHPI)',
-        'subtitle': 'by Giakoumakis Real Estate',
-        'intro_text': 'Ο επίσημος σύνθετος δείκτης για την πορεία της Ελληνικής Κτηματαγοράς.',
+        'title': 'GREECE GHPI',
+        'subtitle': 'HOUSE PRICE INDEX',
+        'intro_text': 'Ο επίσημος σύνθετος δείκτης για την πορεία της Ελληνικής Κτηματαγοράς από την Giakoumakis Real Estate.',
         'tab_data': '📊 Δεδομένα & Στατιστικά',
         'tab_methodology': '📘 Μεθοδολογία & Πηγές',
         'tab_about': '🏢 Η Εταιρεία',
@@ -167,9 +166,9 @@ content = {
         'footer': '© 2025 Giakoumakis Real Estate. All rights reserved.'
     },
     'en': {
-        'title': 'Greece House Price Index (GHPI)',
-        'subtitle': 'by Giakoumakis Real Estate',
-        'intro_text': 'The official composite index tracking the Greek Real Estate Market.',
+        'title': 'GREECE GHPI',
+        'subtitle': 'HOUSE PRICE INDEX',
+        'intro_text': 'The official composite index tracking the Greek Real Estate Market by Giakoumakis Real Estate.',
         'tab_data': '📊 Data & Statistics',
         'tab_methodology': '📘 Methodology & Sources',
         'tab_about': '🏢 About Us',
@@ -221,17 +220,31 @@ text = content[lang]
 
 # --- MAIN HEADER ---
 with top_col1:
-    # Προσπάθεια φόρτωσης λογοτύπου
-    logo_col, title_col = st.columns([1, 6])
-    with logo_col:
-        try:
-            st.image("logo.png", use_container_width=True)
-        except:
-            pass 
-    with title_col:
-        st.markdown(f'<div class="main-title">{text["title"]}</div>', unsafe_allow_html=True)
-        st.markdown(f'<div class="subtitle">{text["subtitle"]}</div>', unsafe_allow_html=True)
+    # 1. Προσπάθεια φόρτωσης και κωδικοποίησης του logo
+    logo_html = ""
+    try:
+        # ΠΡΟΣΟΧΗ: Το αρχείο πρέπει να ονομάζεται 'logo.png' στο GitHub
+        with open("logo.png", "rb") as f:
+            data = f.read()
+        encoded_img = base64.b64encode(data).decode()
+        # HTML για το λογότυπο με δεξί περιθώριο
+        logo_html = f'<img src="data:image/png;base64,{encoded_img}" style="height: 100px; margin-right: 25px; align-self: center; margin-top: 5px;">'
+    except FileNotFoundError:
+        # Αν δεν υπάρχει το αρχείο, απλά δεν δείχνουμε εικόνα
+        pass
 
+    # 2. Συνδυασμός εικόνας και κειμένου σε ένα flex container
+    st.markdown(f"""
+    <div style="display: flex; flex-direction: row; align-items: flex-start;">
+        {logo_html}
+        <div style="display: flex; flex-direction: column; justify-content: center;">
+            <div class="main-title" style="font-size: 2.5rem; line-height: 1.1;">{text["title"]}</div>
+            <div class="subtitle" style="font-size: 1.3rem; margin-top: 5px;">{text["subtitle"]}</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# Intro text κάτω από το header
 st.markdown(f'<div class="intro">{text["intro_text"]}</div>', unsafe_allow_html=True)
 
 # --- DATA ENGINE ---
@@ -277,12 +290,12 @@ with tab1:
     
     # Chart with Theme Aware Colors
     fig_comp = go.Figure()
-    fig_comp.add_trace(go.Scatter(x=df['Year'], y=df['BoG_Index'], name='Bank of Greece (Valuations)', line=dict(dash='dot', width=1.5, color='#3B82F6'))) 
-    fig_comp.add_trace(go.Scatter(x=df['Year'], y=df['SPI_Index'], name='Market Asking Prices', line=dict(dash='dot', width=1.5, color='#EF4444'))) 
-    fig_comp.add_trace(go.Scatter(x=df['Year'], y=df['ELSTAT_Cost'], name='Construction Costs', line=dict(dash='dot', width=1.5, color='#10B981'))) 
+    fig_comp.add_trace(go.Scatter(x=df['Year'], y=df['BoG_Index'], name='Bank of Greece (Valuations)', line=dict(dash='dot', width=1.5, color='#0088C3'))) # Γαλάζιο
+    fig_comp.add_trace(go.Scatter(x=df['Year'], y=df['SPI_Index'], name='Market Asking Prices', line=dict(dash='dot', width=1.5, color='#EF4444'))) # Κόκκινο
+    fig_comp.add_trace(go.Scatter(x=df['Year'], y=df['ELSTAT_Cost'], name='Construction Costs', line=dict(dash='dot', width=1.5, color='#10B981'))) # Πράσινο
     
-    # GHPI Line
-    fig_comp.add_trace(go.Scatter(x=df['Year'], y=df['GHPI'], name='GHPI (Composite)', line=dict(color='#7C3AED', width=4))) 
+    # GHPI Line - Σκούρο Μπλε
+    fig_comp.add_trace(go.Scatter(x=df['Year'], y=df['GHPI'], name='GHPI (Composite)', line=dict(color='#003B71', width=4))) 
 
     fig_comp.update_layout(
         hovermode="x unified", 
@@ -401,7 +414,7 @@ with tab3:
     
     st.markdown(f"""
     <div style="text-align: center; margin-top: 30px;">
-        <a href="https://www.giakoumakis.gr" target="_blank" style="background-color: #3B82F6; color: white; padding: 16px 40px; text-align: center; text-decoration: none; display: inline-block; font-size: 18px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); transition: all 0.3s ease;">
+        <a href="https://www.giakoumakis.gr" target="_blank" style="background-color: #0088C3; color: white; padding: 16px 40px; text-align: center; text-decoration: none; display: inline-block; font-size: 18px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 15px rgba(0, 136, 195, 0.4); transition: all 0.3s ease;">
             {text['visit_button']} 🌐
         </a>
     </div>
