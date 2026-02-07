@@ -10,9 +10,21 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- CSS STYLE (MOBILE RESPONSIVE) ---
+# --- CSS STYLE (THEME AWARE & CLEAN UI) ---
 st.markdown("""
 <style>
+    /* --- ΑΠΟΚΡΥΨΗ ΣΤΟΙΧΕΙΩΝ STREAMLIT (CLEAN MODE) --- */
+    #MainMenu {visibility: hidden;} /* Κρύβει το μενού με τις 3 τελίτσες */
+    footer {visibility: hidden;}    /* Κρύβει το 'Made with Streamlit' κάτω */
+    header {visibility: hidden;}    /* Κρύβει την μπάρα πάνω (Fork, Deploy κλπ) */
+    
+    /* Αν θέλουμε να εξαφανίσουμε τελείως το κενό που αφήνει η μπάρα πάνω: */
+    div.block-container {
+        padding-top: 1rem; /* Μειώνει το κενό στην κορυφή */
+    }
+
+    /* --- ΥΠΟΛΟΙΠΟ STYLE --- */
+    
     /* Γενικά Κείμενα */
     .main-title { 
         font-size: 2.8rem; 
@@ -37,20 +49,18 @@ st.markdown("""
         margin-top: 20px;
     }
     
-    /* Header Container Styling - Desktop Default */
+    /* Mobile Responsiveness για Header */
     .header-container {
         display: flex;
         flex-direction: row;
         align-items: center;
         justify-content: flex-start;
     }
-    
     .logo-img {
         height: 110px;
         margin-right: 25px;
         align-self: center;
     }
-    
     .title-container {
         display: flex;
         flex-direction: column;
@@ -58,49 +68,39 @@ st.markdown("""
         text-align: left;
     }
 
-    /* --- MOBILE RESPONSIVENESS (Magic happens here) --- */
     @media only screen and (max-width: 768px) {
         .header-container {
-            flex-direction: column; /* Στο κινητό γίνονται κάθετα */
-            align-items: center;    /* Κεντράρισμα */
+            flex-direction: column;
+            align-items: center;
             text-align: center;
             margin-bottom: 20px;
         }
-        
         .logo-img {
-            height: 90px;        /* Λίγο μικρότερο λογότυπο */
-            margin-right: 0;     /* Αφαίρεση δεξιού περιθωρίου */
-            margin-bottom: 15px; /* Προσθήκη κενού από κάτω */
+            height: 90px;
+            margin-right: 0;
+            margin-bottom: 15px;
         }
-        
         .title-container {
-            text-align: center;  /* Κεντράρισμα κειμένου */
+            text-align: center;
             align-items: center;
         }
+        .main-title { font-size: 1.8rem; }
+        .subtitle { font-size: 1.1rem; }
         
-        .main-title {
-            font-size: 1.8rem;   /* Μικρότερη γραμματοσειρά τίτλου */
-        }
-        
-        .subtitle {
-            font-size: 1.1rem;   /* Μικρότερη γραμματοσειρά υποτίτλου */
-        }
-    }
-    
-    /* Language Toggle Styling */
-    div.stRadio > div[role="radiogroup"] {
-        flex-direction: row;
-        justify-content: flex-end;
-    }
-    /* Στο κινητό φέρνουμε το language switcher στο κέντρο */
-    @media only screen and (max-width: 768px) {
+        /* Κεντράρισμα language toggle στο κινητό */
         div.stRadio > div[role="radiogroup"] {
-            justify-content: center;
+            justify-content: center !important;
             margin-bottom: 15px;
         }
     }
     
-    /* Boxes & Cards */
+    /* Language Toggle Styling Desktop */
+    div.stRadio > div[role="radiogroup"] {
+        flex-direction: row;
+        justify-content: flex-end;
+    }
+    
+    /* Boxes */
     .source-box { 
         background-color: var(--secondary-background-color); 
         padding: 15px; 
@@ -159,8 +159,6 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- HEADER LAYOUT (LOGO + TITLE & LANGUAGE SWITCHER) ---
-# Στα κινητά το st.columns στοιβάζεται κάθετα (πρώτα το col1, μετά το col2)
-# Αλλάζουμε λίγο τη λογική για να φαίνονται ωραία
 top_col1, top_col2 = st.columns([4, 1])
 
 with top_col2:
@@ -182,14 +180,11 @@ content = {
         'tab_data': '📊 Δεδομένα & Στατιστικά',
         'tab_methodology': '📘 Μεθοδολογία & Πηγές',
         'tab_about': '🏢 Η Εταιρεία',
-        
-        # Stats
         'stat_current': 'Τρέχουσα Τιμή (2025)',
         'stat_yoy': 'Ετήσια Μεταβολή (1Y)',
         'stat_5y': 'Μεταβολή 5ετίας (5Y)',
         'stat_ath': 'Ιστορικό Υψηλό (ATH)',
         'ath_desc': 'από το peak του 2008',
-        
         'chart_compare_title': 'Σύγκριση Πηγών: GHPI vs Επιμέρους Δείκτες',
         'chart_yoy_title': 'Ετήσια Ποσοστιαία Μεταβολή (%)',
         'method_title': 'Μεθοδολογία Υπολογισμού',
@@ -204,8 +199,6 @@ content = {
         'source_1': '🏦 **Τράπεζα της Ελλάδος (Bank of Greece):** Δείκτες Τιμών Οικιστικών Ακινήτων (Πίνακας ΙΙ.1 - Στοιχεία από εκτιμήσεις τραπεζών).',
         'source_2': '📈 **Spitogatos Network (SPI):** Spitogatos Property Index. Βάση δεδομένων ζητούμενων τιμών από αγγελίες ακινήτων.',
         'source_3': '🏗️ **ΕΛΣΤΑΤ (Hellenic Statistical Authority):** Δείκτης Κόστους Υλικών Νέων Κτιρίων Κατοικιών.',
-        
-        # --- ABOUT US TEXT ---
         'hero_title': 'GIAKOUMAKIS REAL ESTATE & PROPERTY DEVELOPER',
         'hero_subtitle': '50+ Χρόνια Εμπειρίας στην Ανάπτυξη Ακινήτων',
         'hero_desc': """
@@ -231,14 +224,11 @@ content = {
         'tab_data': '📊 Data & Statistics',
         'tab_methodology': '📘 Methodology & Sources',
         'tab_about': '🏢 About Us',
-        
-        # Stats
         'stat_current': 'Current Value (2025)',
         'stat_yoy': '1-Year Change (YoY)',
         'stat_5y': '5-Year Change',
         'stat_ath': 'All-Time High (ATH)',
         'ath_desc': 'from 2008 peak',
-
         'chart_compare_title': 'Source Comparison: GHPI vs Sub-Indices',
         'chart_yoy_title': 'Annual Percentage Change (%)',
         'method_title': 'Calculation Methodology',
@@ -253,8 +243,6 @@ content = {
         'source_1': '🏦 **Bank of Greece:** Index of Apartment Prices (Table II.1 - Data collected from bank valuations).',
         'source_2': '📈 **Spitogatos Network (SPI):** Spitogatos Property Index. Database of asking prices from property listings.',
         'source_3': '🏗️ **ELSTAT (Hellenic Statistical Authority):** Material Costs Index for New Residential Buildings.',
-        
-        # --- ABOUT US TEXT ---
         'hero_title': 'GIAKOUMAKIS REAL ESTATE & PROPERTY DEVELOPER',
         'hero_subtitle': '50+ Years of Experience in Property Development',
         'hero_desc': """
@@ -284,12 +272,10 @@ with top_col1:
         with open("logo.png", "rb") as f:
             data = f.read()
         encoded_img = base64.b64encode(data).decode()
-        # Χρήση class 'logo-img' που ελέγχεται από το CSS
         logo_html = f'<img src="data:image/png;base64,{encoded_img}" class="logo-img">'
     except FileNotFoundError:
         pass
 
-    # Χρήση των CSS classes που ορίσαμε (header-container, title-container)
     st.markdown(f"""
     <div class="header-container">
         {logo_html}
@@ -300,7 +286,6 @@ with top_col1:
     </div>
     """, unsafe_allow_html=True)
 
-# Intro text
 st.markdown(f'<div class="intro">{text["intro_text"]}</div>', unsafe_allow_html=True)
 
 # --- DATA ENGINE ---
@@ -317,7 +302,6 @@ df['GHPI'] = (df['BoG_Index'] * 0.50) + (df['SPI_Index'] * 0.30) + (df['ELSTAT_C
 df['GHPI'] = df['GHPI'].round(1)
 df['YoY_Change'] = df['GHPI'].pct_change() * 100
 
-# Extra Stats Calculation
 latest_val = df['GHPI'].iloc[-1]
 prev_year_val = df['GHPI'].iloc[-2]
 five_years_ago_val = df['GHPI'].iloc[-6] 
@@ -344,13 +328,10 @@ with tab1:
 
     st.subheader(text['chart_compare_title'])
     
-    # Chart with Theme Aware Colors
     fig_comp = go.Figure()
-    fig_comp.add_trace(go.Scatter(x=df['Year'], y=df['BoG_Index'], name='Bank of Greece (Valuations)', line=dict(dash='dot', width=1.5, color='#0088C3'))) # Γαλάζιο
-    fig_comp.add_trace(go.Scatter(x=df['Year'], y=df['SPI_Index'], name='Market Asking Prices', line=dict(dash='dot', width=1.5, color='#EF4444'))) # Κόκκινο
-    fig_comp.add_trace(go.Scatter(x=df['Year'], y=df['ELSTAT_Cost'], name='Construction Costs', line=dict(dash='dot', width=1.5, color='#10B981'))) # Πράσινο
-    
-    # GHPI Line - Σκούρο Μπλε
+    fig_comp.add_trace(go.Scatter(x=df['Year'], y=df['BoG_Index'], name='Bank of Greece (Valuations)', line=dict(dash='dot', width=1.5, color='#0088C3'))) 
+    fig_comp.add_trace(go.Scatter(x=df['Year'], y=df['SPI_Index'], name='Market Asking Prices', line=dict(dash='dot', width=1.5, color='#EF4444'))) 
+    fig_comp.add_trace(go.Scatter(x=df['Year'], y=df['ELSTAT_Cost'], name='Construction Costs', line=dict(dash='dot', width=1.5, color='#10B981'))) 
     fig_comp.add_trace(go.Scatter(x=df['Year'], y=df['GHPI'], name='GHPI (Composite)', line=dict(color='#003B71', width=4))) 
 
     fig_comp.update_layout(
@@ -410,7 +391,6 @@ with tab3:
     
     st.subheader(text['services_main_title'])
     
-    # Row 1
     col1, col2, col3 = st.columns(3)
     with col1:
         st.markdown(f"""
@@ -439,7 +419,6 @@ with tab3:
     
     st.write("") 
     
-    # Row 2
     col4, col5, col6 = st.columns(3)
     with col4:
         st.markdown(f"""
@@ -477,5 +456,6 @@ with tab3:
     """, unsafe_allow_html=True)
 
 # --- FOOTER ---
+# Το CSS πάνω έχει ήδη κρύψει το αυθεντικό footer. Αυτό είναι το custom κείμενο μας.
 st.markdown("---")
 st.markdown(f"<div style='text-align: center; color: grey; font-size: 0.8rem;'>{text['footer']}</div>", unsafe_allow_html=True)
