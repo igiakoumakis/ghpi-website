@@ -84,14 +84,14 @@ else:
     lang = 'en'
     st.session_state['lang_index'] = 1
 
-# --- CONTENTS ---
+# --- CONTENTS (ENHANCED SEO & METHODOLOGY) ---
 content = {
     'el': {
         'title': 'Δείκτης Τιμών Ακινήτων Ελλάδας (GHPI)',
         'subtitle': 'από Γιακουμάκης Ακίνητα',
         'intro_text': 'Ο επίσημος σύνθετος δείκτης για την πορεία της Ελληνικής Κτηματαγοράς.',
         'tab_data': '📊 GHPI & Στατιστικά',
-        'tab_methodology': '📘 Μεθοδολογία',
+        'tab_methodology': '📘 Μεθοδολογία & Ανάλυση',
         'tab_macro': '📈 Μακροοικονομικά',
         'tab_about': '🏢 Η Εταιρεία',
         
@@ -111,9 +111,59 @@ content = {
         'lbl_permits': 'Οικοδ. Άδειες (χιλ.)', 'lbl_fdi': 'Ξένες Επενδύσεις (FDI - εκ. €)', 'lbl_mort': 'Νέα Στεγαστικά (εκ. €)', 'lbl_trans': 'Συναλλαγές (χιλ.)',
         'macro_table_title': 'Συγκεντρωτικός Πίνακας Μακροοικονομικών Δεικτών',
 
-        # Methodology & About
-        'method_title': 'Μεθοδολογία Υπολογισμού', 'method_intro': 'Ο δείκτης GHPI σταθμίζει τρεις κρίσιμους παράγοντες:', 'method_p1': '1. Τραπεζικές Εκτιμήσεις (50%)', 'method_p2': '2. Τάσεις Αγοράς (30%)', 'method_p3': '3. Κόστος Κατασκευής (20%)',
-        'sources_title': '📚 Πηγές Δεδομένων', 'source_1': '🏦 **Τράπεζα της Ελλάδος:** Δείκτες Τιμών Οικιστικών Ακινήτων.', 'source_2': '📈 **Spitogatos Network:** Βάση δεδομένων ζητούμενων τιμών.', 'source_3': '🏗️ **ΕΛΣΤΑΤ:** Δείκτης Κόστους Υλικών Νέων Κτιρίων.',
+        # --- UPDATED METHODOLOGY TEXTS ---
+        'method_title': 'Αναλυτική Μεθοδολογία & Σκεπτικό του Δείκτη GHPI',
+        
+        'meth_sec1_title': 'Γιατί είναι απαραίτητος ένας Σύνθετος Δείκτης;',
+        'meth_sec1_body': """
+        Οι δείκτες τιμών ακινήτων (House Price Indices - HPIs) αποτελούν θεμελιώδη εργαλεία για την κατανόηση της οικονομικής υγείας μιας χώρας. 
+        Επηρεάζουν τις αποφάσεις των επενδυτών, την πολιτική των τραπεζών και τον προγραμματισμό των κατασκευαστικών εταιρειών. 
+        Στην Ελλάδα, ωστόσο, η έλλειψη ενός κεντρικού, πλήρως διαφανούς μητρώου πραγματικών τιμών πώλησης δημιουργεί "θόρυβο" στην πληροφόρηση.
+        
+        Ο **GHPI (Giakoumakis House Price Index)** δημιουργήθηκε για να καλύψει αυτό το κενό. Αντί να βασίζεται σε μία μόνο πηγή, 
+        συνθέτει δεδομένα από τρεις διαφορετικές οπτικές γωνίες της αγοράς, προσφέροντας μια ολιστική και πιο αξιόπιστη εικόνα.
+        """,
+
+        'meth_sec2_title': 'Ανάλυση των Πηγών Δεδομένων (Sub-Indices)',
+        'meth_src1_t': '1. Τραπεζικές Εκτιμήσεις (Bank of Greece)',
+        'meth_src1_d': """
+        **Τι είναι:** Ο επίσημος δείκτης που βασίζεται στις εκτιμήσεις ακινήτων που πραγματοποιούν οι τράπεζες για την έκδοση δανείων.
+        \n**👍 Πλεονεκτήματα:** Υψηλή αξιοπιστία, πραγματοποιούνται από πιστοποιημένους εκτιμητές, μεγάλο δείγμα δεδομένων.
+        \n**👎 Μειονεκτήματα:** Οι εκτιμήσεις είναι συχνά συντηρητικές (χαμηλότερες της εμπορικής αξίας) και παρουσιάζουν χρονική υστέρηση (time lag) σε σχέση με την αγορά.
+        """,
+        
+        'meth_src2_t': '2. Ζητούμενες Τιμές (Market Asking Prices)',
+        'meth_src2_d': """
+        **Τι είναι:** Δεδομένα από μεγάλες πύλες αγγελιών (όπως το Spitogatos Network) που καταγράφουν τι ζητούν οι ιδιοκτήτες.
+        \n**👍 Πλεονεκτήματα:** Άμεση αποτύπωση του "κλίματος" και των προσδοκιών της αγοράς (Sentiment). Αντιδρά γρήγορα στις αλλαγές.
+        \n**👎 Μειονεκτήματα:** Η ζητούμενη τιμή σπάνια είναι η τιμή κλεισίματος (Closing Price). Συχνά περιέχει "καπέλο" διαπραγμάτευσης.
+        """,
+        
+        'meth_src3_t': '3. Κόστος Κατασκευής (Construction Cost - ELSTAT)',
+        'meth_src3_d': """
+        **Τι είναι:** Ο δείκτης κόστους υλικών και εργατικών για νέες κατοικίες από την ΕΛΣΤΑΤ.
+        \n**👍 Πλεονεκτήματα:** Αντικειμενικό, σκληρό δεδομένο. Δείχνει την "αξία αντικατάστασης" ενός ακινήτου.
+        \n**👎 Μειονεκτήματα:** Δεν λαμβάνει υπόψη την αξία της γης (οικόπεδο) ή την προσφορά και ζήτηση.
+        """,
+
+        'meth_sec3_title': 'Η Φόρμουλα του GHPI & Η Στάθμιση',
+        'meth_sec3_body': """
+        Επιλέξαμε μια σταθμισμένη προσέγγιση για να εξισορροπήσουμε τις αδυναμίες κάθε πηγής:
+        * **50% Τράπεζες:** Η μεγαλύτερη βαρύτητα δίνεται εδώ ως η πιο σταθερή και θεσμική βάση.
+        * **30% Αγορά (Αγγελίες):** Αρκετή βαρύτητα για να πιάσουμε την τάση, αλλά όχι κυρίαρχη για να αποφύγουμε τις "φούσκες" των ζητούμενων τιμών.
+        * **20% Κόστος:** Λειτουργεί ως άγκυρα λογικής. Οι τιμές δεν μπορούν μακροπρόθεσμα να πέσουν κάτω από το κόστος κατασκευής.
+        
+        **Γιατί Ετήσιος Δείκτης;**
+        Η αγορά ακινήτων είναι "αργή" (illiquid asset). Οι μηνιαίες διακυμάνσεις συχνά οφείλονται σε τυχαία γεγονότα ή εποχικότητα. 
+        Η ετήσια προσέγγιση φιλτράρει αυτόν τον θόρυβο και αναδεικνύει την πραγματική, μακροχρόνια τάση (Trend).
+        """,
+        
+        # ORIGINAL SOURCES
+        'sources_title': '📚 Πηγές Δεδομένων (Links)',
+        'source_1': '🏦 **Τράπεζα της Ελλάδος (Bank of Greece):** Δείκτες Τιμών Οικιστικών Ακινήτων (Πίνακας ΙΙ.1 - Στοιχεία από εκτιμήσεις τραπεζών).',
+        'source_2': '📈 **Spitogatos Network (SPI):** Spitogatos Property Index. Βάση δεδομένων ζητούμενων τιμών από αγγελίες ακινήτων.',
+        'source_3': '🏗️ **ΕΛΣΤΑΤ (Hellenic Statistical Authority):** Δείκτης Κόστους Υλικών Νέων Κτιρίων Κατοικιών.',
+
         'hero_title': 'GIAKOUMAKIS REAL ESTATE', 'hero_subtitle': '50+ Χρόνια Εμπειρίας', 'hero_desc': 'Ολοκληρωμένες λύσεις ακινήτων από το 1970.',
         'services_main_title': 'Οι Υπηρεσίες μας', 's1_t': 'Real Estate', 's1_d': 'Πωλήσεις & Ενοικιάσεις.', 's2_t': 'Μελέτες', 's2_d': 'Τοπογραφικά & Αρχιτεκτονικά.', 's3_t': 'Κατασκευές', 's3_d': 'Πολυτελείς κατοικίες.', 's4_t': 'Management', 's4_d': 'Διοίκηση έργων.', 's5_t': 'Ενέργεια', 's5_d': 'Αναβαθμίσεις.', 's6_t': 'Business', 's6_d': 'Τουριστική εκμετάλλευση.', 'visit_button': 'Επισκεφθείτε το giakoumakis.gr', 'footer': '© 2025 Giakoumakis Real Estate.'
     },
@@ -122,17 +172,15 @@ content = {
         'subtitle': 'by Giakoumakis Real Estate',
         'intro_text': 'The official composite index tracking the Greek Real Estate Market.',
         'tab_data': '📊 GHPI & Stats',
-        'tab_methodology': '📘 Methodology',
+        'tab_methodology': '📘 Methodology & Analysis',
         'tab_macro': '📈 Macro Analysis',
         'tab_about': '🏢 About Us',
         
-        # Stats & Charts
         'stat_current': 'Current Value (2025)', 'stat_yoy': '1-Year Change (YoY)', 'stat_5y': '5-Year Change', 'stat_ath': 'All-Time High (ATH)', 'ath_desc': 'from 2008 peak',
         'chart_compare_title': 'Source Comparison: GHPI vs Sub-Indices', 'chart_yoy_title': 'Annual Percentage Change (%)',
         'table_title': 'Summary Table', 'col_year': 'Year', 'col_ghpi': 'GHPI Value', 'col_yoy': 'YoY Change',
         'full_table_title': 'View Full Source Data (All Indices)',
         
-        # Macro Tab
         'macro_intro': 'Comparative analysis of key Greek Economic indicators vs Real Estate market.',
         'macro_c1_title': '1. General Economy: GDP vs Stock Market',
         'macro_c2_title': '2. Supply & Demand: Permits vs Transactions',
@@ -142,9 +190,59 @@ content = {
         'lbl_permits': 'Build. Permits (thous.)', 'lbl_fdi': 'FDI (Real Estate - M€)', 'lbl_mort': 'New Mortgages (M€)', 'lbl_trans': 'Transactions (thous.)',
         'macro_table_title': 'Consolidated Macroeconomic Data Table',
 
-        # Methodology & About
-        'method_title': 'Calculation Methodology', 'method_intro': 'The GHPI weights three critical factors:', 'method_p1': '1. Bank Valuations (50%)', 'method_p2': '2. Market Trends (30%)', 'method_p3': '3. Construction Cost (20%)',
-        'sources_title': '📚 Data Sources', 'source_1': '🏦 **Bank of Greece:** Index of Apartment Prices.', 'source_2': '📈 **Spitogatos Network:** Asking prices database.', 'source_3': '🏗️ **ELSTAT:** Material Costs Index.',
+        # --- UPDATED METHODOLOGY TEXTS ---
+        'method_title': 'Detailed Methodology & GHPI Framework',
+        
+        'meth_sec1_title': 'Why a Composite Index is Necessary?',
+        'meth_sec1_body': """
+        House Price Indices (HPIs) are fundamental tools for understanding a country's economic health. 
+        They influence investor decisions, banking policies, and developer planning. 
+        However, in Greece, the lack of a centralized, fully transparent registry of actual transaction prices creates "noise" in the data.
+        
+        The **GHPI (Giakoumakis House Price Index)** was created to bridge this gap. Instead of relying on a single source, 
+        it synthesizes data from three different market perspectives, offering a holistic and more reliable view.
+        """,
+
+        'meth_sec2_title': 'Analysis of Data Sources (Sub-Indices)',
+        'meth_src1_t': '1. Bank Valuations (Bank of Greece)',
+        'meth_src1_d': """
+        **What it is:** The official index based on property appraisals conducted by banks for mortgage purposes.
+        \n**👍 Pros:** High reliability, conducted by certified valuers, large dataset.
+        \n**👎 Cons:** Valuations are often conservative (below market value) and suffer from a time lag compared to the market.
+        """,
+        
+        'meth_src2_t': '2. Asking Prices (Market Sentiment)',
+        'meth_src2_d': """
+        **What it is:** Data from major listing portals (e.g., Spitogatos) recording what owners are asking for.
+        \n**👍 Pros:** Immediate reflection of market "sentiment" and expectations. Reacts quickly to changes.
+        \n**👎 Cons:** Asking price is rarely the Closing Price. It often contains a negotiation "premium" or bubble tendencies.
+        """,
+        
+        'meth_src3_t': '3. Construction Cost (ELSTAT)',
+        'meth_src3_d': """
+        **What it is:** The index of material and labor costs for new dwellings provided by the Statistical Authority.
+        \n**👍 Pros:** Objective, hard data. Shows the "replacement cost" of a property.
+        \n**👎 Cons:** Does not account for land value or supply/demand dynamics.
+        """,
+
+        'meth_sec3_title': 'The GHPI Formula & Weighting Strategy',
+        'meth_sec3_body': """
+        We chose a weighted approach to balance the weaknesses of each source:
+        * **50% Banks:** Given the highest weight as the most stable, institutional baseline.
+        * **30% Market (Listings):** Significant enough to capture trends, but not dominant to avoid asking-price volatility.
+        * **20% Cost:** Acts as a logic anchor. Prices cannot stay below construction costs in the long run.
+        
+        **Why an Annual Index?**
+        Real estate is an illiquid asset. Monthly fluctuations are often due to random events or seasonality. 
+        An annual approach filters out this noise and highlights the true, long-term Trend.
+        """,
+        
+        # ORIGINAL SOURCES
+        'sources_title': '📚 Data Sources (Links)',
+        'source_1': '🏦 **Bank of Greece:** Index of Apartment Prices (Table II.1 - Data collected from bank valuations).',
+        'source_2': '📈 **Spitogatos Network (SPI):** Spitogatos Property Index. Database of asking prices from property listings.',
+        'source_3': '🏗️ **ELSTAT (Hellenic Statistical Authority):** Material Costs Index for New Residential Buildings.',
+
         'hero_title': 'GIAKOUMAKIS REAL ESTATE', 'hero_subtitle': '50+ Years of Experience', 'hero_desc': 'Integrated real estate solutions since 1970.',
         'services_main_title': 'Our Services', 's1_t': 'Real Estate', 's1_d': 'Sales & Rentals.', 's2_t': 'Engineering', 's2_d': 'Topographical & Structural.', 's3_t': 'Construction', 's3_d': 'Luxury development.', 's4_t': 'Management', 's4_d': 'Project administration.', 's5_t': 'Energy', 's5_d': 'Efficiency solutions.', 's6_t': 'Business', 's6_d': 'Hospitality operations.', 'visit_button': 'Visit giakoumakis.gr', 'footer': '© 2025 Giakoumakis Real Estate.'
     }
@@ -192,7 +290,6 @@ df_macro = pd.DataFrame(macro_data)
 df_macro['Date'] = pd.to_datetime(df_macro['Year'], format='%Y')
 df_macro['GHPI_YoY'] = df['YoY_Change']
 
-# Υπολογισμός ορίων για να κλειδώσουμε το zoom
 min_date = df['Date'].min()
 max_date = df['Date'].max()
 
@@ -208,23 +305,22 @@ diff_from_ath = latest_val - ath_val
 common_xaxis = dict(
     type="date",
     range=[min_date, max_date], 
-    fixedrange=True, # ΚΛΕΙΔΩΜΑ ZOOM
+    fixedrange=True, # Lock Zoom
     rangeselector=dict(
         buttons=list([
             dict(count=5, label="5Y", step="year", stepmode="backward"),
             dict(count=10, label="10Y", step="year", stepmode="backward"),
             dict(step="all", label="MAX")
         ]),
-        bgcolor='#f0f2f6',        # Απαλό γκρι φόντο
-        activecolor='#0088C3',    # Χρώμα επιλογής
-        font=dict(color='black'), # <--- ΕΠΙΒΟΛΗ ΜΑΥΡΟΥ ΧΡΩΜΑΤΟΣ ΓΙΑ READABILITY
+        bgcolor='#f0f2f6',
+        activecolor='#0088C3',
+        font=dict(color='black'), # Black fonts for dark mode support
         x=1, 
         y=1.2,
         xanchor='right'
     )
 )
 
-# Common config to disable interactions
 no_zoom_config = {
     'displayModeBar': False, 
     'scrollZoom': False,  
@@ -253,16 +349,9 @@ with tab1:
     fig_comp.add_trace(go.Scatter(x=df['Date'], y=df['GHPI'], name='GHPI', line=dict(color='#003B71', width=4))) 
     
     fig_comp.update_layout(
-        hovermode="x unified", 
-        height=450, 
-        legend=dict(orientation="h", y=1.2), 
-        margin=dict(l=20, r=20, t=20, b=20), 
-        paper_bgcolor='rgba(0,0,0,0)', 
-        plot_bgcolor='rgba(0,0,0,0)', 
-        font=dict(color=None),
-        dragmode=False, 
-        xaxis=common_xaxis,
-        yaxis=dict(fixedrange=True) 
+        hovermode="x unified", height=450, legend=dict(orientation="h", y=1.2), 
+        margin=dict(l=20, r=20, t=20, b=20), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color=None),
+        dragmode=False, xaxis=common_xaxis, yaxis=dict(fixedrange=True) 
     )
     st.plotly_chart(fig_comp, use_container_width=True, config=no_zoom_config)
 
@@ -270,15 +359,9 @@ with tab1:
     colors = ['#EF4444' if x < 0 else '#10B981' for x in df['YoY_Change']]
     fig_bar = go.Figure(go.Bar(x=df['Date'], y=df['YoY_Change'], marker_color=colors, text=df['YoY_Change'].apply(lambda x: f'{x:.1f}%' if pd.notnull(x) else ''), textposition='outside'))
     fig_bar.update_layout(
-        height=350, 
-        showlegend=False, 
-        margin=dict(l=20, r=20, t=20, b=20), 
-        paper_bgcolor='rgba(0,0,0,0)', 
-        plot_bgcolor='rgba(0,0,0,0)', 
-        font=dict(color=None),
-        dragmode=False,
-        xaxis=common_xaxis,
-        yaxis=dict(fixedrange=True)
+        height=350, showlegend=False, margin=dict(l=20, r=20, t=20, b=20), 
+        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color=None),
+        dragmode=False, xaxis=common_xaxis, yaxis=dict(fixedrange=True)
     )
     st.plotly_chart(fig_bar, use_container_width=True, config=no_zoom_config)
     
@@ -303,19 +386,45 @@ with tab1:
             hide_index=True
         )
 
-# === TAB 2: METHODOLOGY ===
+# === TAB 2: METHODOLOGY (UPDATED LAYOUT) ===
 with tab2:
     st.header(text['method_title'])
-    st.markdown(text['method_intro'])
-    c1, c2, c3 = st.columns(3)
-    c1.info(f"**{text['method_p1']}**")
-    c2.warning(f"**{text['method_p2']}**")
-    c3.success(f"**{text['method_p3']}**")
-    st.markdown("### The Formula")
+    
+    # Section 1: Introduction
+    st.subheader(text['meth_sec1_title'])
+    st.markdown(text['meth_sec1_body'])
+    st.divider()
+
+    # Section 2: Formula & Visualization
+    st.subheader(text['meth_sec3_title'])
+    st.markdown(text['meth_sec3_body'])
+    st.info("The Formula / Ο Τύπος:")
     st.latex(r'''GHPI_t = (0.5 \times I_{Bank}) + (0.3 \times I_{Market}) + (0.2 \times I_{Cost})''')
     st.divider()
+    
+    # Section 3: Deep Dive into Sources (Columns)
+    st.subheader(text['meth_sec2_title'])
+    c1, c2, c3 = st.columns(3)
+    
+    with c1:
+        st.markdown(f"#### {text['meth_src1_t']}")
+        st.info(text['meth_src1_d'])
+        
+    with c2:
+        st.markdown(f"#### {text['meth_src2_t']}")
+        st.warning(text['meth_src2_d'])
+        
+    with c3:
+        st.markdown(f"#### {text['meth_src3_t']}")
+        st.success(text['meth_src3_d'])
+        
+    st.divider()
+    
+    # ADDED BACK: SOURCES BOX
     st.subheader(text['sources_title'])
     st.markdown(f"""<div class="source-box">{text['source_1']}<br><br>{text['source_2']}<br><br>{text['source_3']}</div>""", unsafe_allow_html=True)
+    
+    st.caption("Data sources are updated annually to ensure consistency and eliminate seasonal noise.")
 
 # === TAB 3: MACROECONOMIC ANALYSIS ===
 with tab3:
