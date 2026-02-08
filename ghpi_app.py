@@ -4,7 +4,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import base64
 import requests
-from datetime import timedelta # Χρήσιμο για μικρο-διορθώσεις στα όρια
+from datetime import timedelta
 
 # --- ΡΥΘΜΙΣΕΙΣ ΣΕΛΙΔΑΣ ---
 st.set_page_config(
@@ -207,7 +207,8 @@ diff_from_ath = latest_val - ath_val
 # --- COMMON CHART SETTINGS ---
 common_xaxis = dict(
     type="date",
-    range=[min_date, max_date], # Σκληρό όριο αρχικής προβολής (αποτρέπει το υπερβολικό zoom out αρχικά)
+    range=[min_date, max_date], # Σκληρό όριο αρχικής προβολής
+    fixedrange=True, # ΚΛΕΙΔΩΜΑ ZOOM
     rangeselector=dict(
         buttons=list([
             dict(count=5, label="5Y", step="year", stepmode="backward"),
@@ -220,6 +221,14 @@ common_xaxis = dict(
         xanchor='right' # ΕΥΘΥΓΡΑΜΜΙΣΗ ΔΕΞΙΑ
     )
 )
+
+# Common config to disable interactions
+no_zoom_config = {
+    'displayModeBar': False, 
+    'scrollZoom': False,  # No scroll zoom
+    'doubleClick': False, # No double click zoom
+    'showTips': False
+}
 
 # --- TABS ---
 tab1, tab2, tab3, tab4 = st.tabs([f"{text['tab_data']}", f"{text['tab_methodology']}", f"{text['tab_macro']}", f"{text['tab_about']}"])
@@ -249,10 +258,11 @@ with tab1:
         paper_bgcolor='rgba(0,0,0,0)', 
         plot_bgcolor='rgba(0,0,0,0)', 
         font=dict(color=None),
-        dragmode='pan',
-        xaxis=common_xaxis # Εφαρμογή των ρυθμίσεων (δεξιά κουμπιά + όρια)
+        dragmode=False, # Disable drag
+        xaxis=common_xaxis,
+        yaxis=dict(fixedrange=True) # Lock Y axis
     )
-    st.plotly_chart(fig_comp, use_container_width=True, config={'displayModeBar': False, 'scrollZoom': True})
+    st.plotly_chart(fig_comp, use_container_width=True, config=no_zoom_config)
 
     st.subheader(text['chart_yoy_title'])
     colors = ['#EF4444' if x < 0 else '#10B981' for x in df['YoY_Change']]
@@ -264,10 +274,11 @@ with tab1:
         paper_bgcolor='rgba(0,0,0,0)', 
         plot_bgcolor='rgba(0,0,0,0)', 
         font=dict(color=None),
-        dragmode='pan',
-        xaxis=common_xaxis
+        dragmode=False,
+        xaxis=common_xaxis,
+        yaxis=dict(fixedrange=True)
     )
-    st.plotly_chart(fig_bar, use_container_width=True, config={'displayModeBar': False, 'scrollZoom': True})
+    st.plotly_chart(fig_bar, use_container_width=True, config=no_zoom_config)
     
     st.divider()
     st.subheader(text['table_title'])
@@ -317,11 +328,11 @@ with tab3:
     fig_macro1.update_layout(
         height=400, hovermode="x unified", legend=dict(orientation="h", y=1.2), 
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color=None),
-        dragmode='pan', xaxis=common_xaxis
+        dragmode=False, xaxis=common_xaxis, yaxis=dict(fixedrange=True), yaxis2=dict(fixedrange=True)
     )
     fig_macro1.update_yaxes(title_text="GDP (€ Bn)", secondary_y=False)
     fig_macro1.update_yaxes(title_text="ASE Index Points", secondary_y=True)
-    st.plotly_chart(fig_macro1, use_container_width=True, config={'displayModeBar': False, 'scrollZoom': True})
+    st.plotly_chart(fig_macro1, use_container_width=True, config=no_zoom_config)
     
     st.divider()
 
@@ -334,9 +345,9 @@ with tab3:
         height=400, hovermode="x unified", legend=dict(orientation="h", y=1.2), 
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color=None), 
         yaxis_title="Units (Thousands)",
-        dragmode='pan', xaxis=common_xaxis
+        dragmode=False, xaxis=common_xaxis, yaxis=dict(fixedrange=True)
     )
-    st.plotly_chart(fig_macro_act, use_container_width=True, config={'displayModeBar': False, 'scrollZoom': True})
+    st.plotly_chart(fig_macro_act, use_container_width=True, config=no_zoom_config)
 
     st.divider()
 
@@ -349,9 +360,9 @@ with tab3:
         height=400, hovermode="x unified", legend=dict(orientation="h", y=1.2), 
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color=None), 
         yaxis_title="Amount (Million €)",
-        dragmode='pan', xaxis=common_xaxis
+        dragmode=False, xaxis=common_xaxis, yaxis=dict(fixedrange=True)
     )
-    st.plotly_chart(fig_macro_liq, use_container_width=True, config={'displayModeBar': False, 'scrollZoom': True})
+    st.plotly_chart(fig_macro_liq, use_container_width=True, config=no_zoom_config)
     
     st.divider()
 
@@ -364,9 +375,9 @@ with tab3:
         height=400, hovermode="x unified", legend=dict(orientation="h", y=1.2), 
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color=None), 
         yaxis_title="Percentage (%)",
-        dragmode='pan', xaxis=common_xaxis
+        dragmode=False, xaxis=common_xaxis, yaxis=dict(fixedrange=True)
     )
-    st.plotly_chart(fig_macro2, use_container_width=True, config={'displayModeBar': False, 'scrollZoom': True})
+    st.plotly_chart(fig_macro2, use_container_width=True, config=no_zoom_config)
 
     # --- TABLE ---
     with st.expander(f"📂 {text['macro_table_title']}", expanded=False):
