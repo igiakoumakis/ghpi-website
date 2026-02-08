@@ -207,7 +207,7 @@ diff_from_ath = latest_val - ath_val
 # --- COMMON CHART SETTINGS ---
 common_xaxis = dict(
     type="date",
-    range=[min_date, max_date], # Σκληρό όριο αρχικής προβολής
+    range=[min_date, max_date], 
     fixedrange=True, # ΚΛΕΙΔΩΜΑ ZOOM
     rangeselector=dict(
         buttons=list([
@@ -215,18 +215,20 @@ common_xaxis = dict(
             dict(count=10, label="10Y", step="year", stepmode="backward"),
             dict(step="all", label="MAX")
         ]),
-        bgcolor='rgba(255, 255, 255, 0.9)',
-        x=1, # ΤΕΡΜΑ ΔΕΞΙΑ
+        bgcolor='#f0f2f6',        # Απαλό γκρι φόντο
+        activecolor='#0088C3',    # Χρώμα επιλογής
+        font=dict(color='black'), # <--- ΕΠΙΒΟΛΗ ΜΑΥΡΟΥ ΧΡΩΜΑΤΟΣ ΓΙΑ READABILITY
+        x=1, 
         y=1.2,
-        xanchor='right' # ΕΥΘΥΓΡΑΜΜΙΣΗ ΔΕΞΙΑ
+        xanchor='right'
     )
 )
 
 # Common config to disable interactions
 no_zoom_config = {
     'displayModeBar': False, 
-    'scrollZoom': False,  # No scroll zoom
-    'doubleClick': False, # No double click zoom
+    'scrollZoom': False,  
+    'doubleClick': False, 
     'showTips': False
 }
 
@@ -258,9 +260,9 @@ with tab1:
         paper_bgcolor='rgba(0,0,0,0)', 
         plot_bgcolor='rgba(0,0,0,0)', 
         font=dict(color=None),
-        dragmode=False, # Disable drag
+        dragmode=False, 
         xaxis=common_xaxis,
-        yaxis=dict(fixedrange=True) # Lock Y axis
+        yaxis=dict(fixedrange=True) 
     )
     st.plotly_chart(fig_comp, use_container_width=True, config=no_zoom_config)
 
