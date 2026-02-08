@@ -239,9 +239,9 @@ content = {
         
         # ORIGINAL SOURCES
         'sources_title': '📚 Data Sources (Links)',
-        'source_1': '🏦 **Bank of Greece:** Index of Apartment Prices (Table II.1 - Data collected from bank valuations).',
-        'source_2': '📈 **Spitogatos Network (SPI):** Spitogatos Property Index. Database of asking prices from property listings.',
-        'source_3': '🏗️ **ELSTAT (Hellenic Statistical Authority):** Material Costs Index for New Residential Buildings.',
+        'source_1': '🏦 **Bank of Greece:** Index of Apartment Prices.',
+        'source_2': '📈 **Spitogatos Network:** Asking prices database.',
+        'source_3': '🏗️ **ELSTAT:** Material Costs Index.',
 
         'hero_title': 'GIAKOUMAKIS REAL ESTATE', 'hero_subtitle': '50+ Years of Experience', 'hero_desc': 'Integrated real estate solutions since 1970.',
         'services_main_title': 'Our Services', 's1_t': 'Real Estate', 's1_d': 'Sales & Rentals.', 's2_t': 'Engineering', 's2_d': 'Topographical & Structural.', 's3_t': 'Construction', 's3_d': 'Luxury development.', 's4_t': 'Management', 's4_d': 'Project administration.', 's5_t': 'Energy', 's5_d': 'Efficiency solutions.', 's6_t': 'Business', 's6_d': 'Hospitality operations.', 'visit_button': 'Visit giakoumakis.gr', 'footer': '© 2025 Giakoumakis Real Estate.'
@@ -313,8 +313,8 @@ common_xaxis = dict(
             dict(step="all", label="MAX")
         ]),
         bgcolor='#f0f2f6',
-        activecolor='#0088C3',
-        font=dict(color='black'), # Black fonts for dark mode support
+        activecolor='#d1d5db', # Light Grey active color
+        font=dict(color='black'), # Force black text
         x=1, 
         y=1.2,
         xanchor='right'
@@ -492,7 +492,7 @@ with tab3:
 
     # --- TABLE ---
     with st.expander(f"📂 {text['macro_table_title']}", expanded=False):
-        macro_display = df_macro.drop(columns=['Date']).sort_values(by='Year', ascending=False)
+        macro_display = df_macro.drop(columns=['Date', 'GHPI_YoY']).sort_values(by='Year', ascending=False)
         st.dataframe(
             macro_display,
             column_config={
