@@ -4,6 +4,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import base64
 import requests
+from datetime import timedelta # Χρήσιμο για μικρο-διορθώσεις στα όρια
 
 # --- ΡΥΘΜΙΣΕΙΣ ΣΕΛΙΔΑΣ ---
 st.set_page_config(
@@ -170,7 +171,6 @@ data = {
     'ELSTAT_Cost': [70, 72, 75, 78, 82, 86, 90, 93, 96, 98, 100, 101, 100, 98, 96, 95, 94, 95, 96, 97, 96.5, 100, 110, 118, 125, 129]
 }
 df = pd.DataFrame(data)
-# ΜΕΤΑΤΡΟΠΗ ΣΕ ΗΜΕΡΟΜΗΝΙΑ ΓΙΑ ΝΑ ΛΕΙΤΟΥΡΓΕΙ ΤΟ RANGE SELECTOR
 df['Date'] = pd.to_datetime(df['Year'], format='%Y')
 
 df['GHPI'] = (df['BoG_Index'] * 0.50) + (df['SPI_Index'] * 0.30) + (df['ELSTAT_Cost'] * 0.20)
@@ -189,9 +189,12 @@ macro_data = {
     'Transactions_Thous': [150, 165, 170, 160, 155, 175, 160, 145, 110, 85, 70, 50, 40, 35, 30, 38, 45, 55, 65, 75, 60, 75, 85, 95, 100, 105]
 }
 df_macro = pd.DataFrame(macro_data)
-# ΜΕΤΑΤΡΟΠΗ ΣΕ ΗΜΕΡΟΜΗΝΙΑ
 df_macro['Date'] = pd.to_datetime(df_macro['Year'], format='%Y')
 df_macro['GHPI_YoY'] = df['YoY_Change']
+
+# Υπολογισμός ορίων για να κλειδώσουμε το zoom
+min_date = df['Date'].min()
+max_date = df['Date'].max()
 
 # KPI Calcs
 latest_val, prev_year_val = df['GHPI'].iloc[-1], df['GHPI'].iloc[-2]
@@ -202,17 +205,19 @@ ath_val = df['GHPI'].max()
 diff_from_ath = latest_val - ath_val 
 
 # --- COMMON CHART SETTINGS ---
-# Αυτό το λεξικό ορίζει τα κουμπιά που θέλουμε σε όλα τα γραφήματα
 common_xaxis = dict(
-    type="date", # Απαραίτητο για να δουλέψουν τα date steps
+    type="date",
+    range=[min_date, max_date], # Σκληρό όριο αρχικής προβολής (αποτρέπει το υπερβολικό zoom out αρχικά)
     rangeselector=dict(
         buttons=list([
             dict(count=5, label="5Y", step="year", stepmode="backward"),
             dict(count=10, label="10Y", step="year", stepmode="backward"),
             dict(step="all", label="MAX")
         ]),
-        bgcolor='rgba(255, 255, 255, 0.9)', # Ελαφρώς αδιαφανές background για να φαίνονται τα κουμπιά
-        x=0, y=1.1 # Θέση κουμπιών πάνω αριστερά
+        bgcolor='rgba(255, 255, 255, 0.9)',
+        x=1, # ΤΕΡΜΑ ΔΕΞΙΑ
+        y=1.2,
+        xanchor='right' # ΕΥΘΥΓΡΑΜΜΙΣΗ ΔΕΞΙΑ
     )
 )
 
@@ -231,7 +236,6 @@ with tab1:
 
     st.subheader(text['chart_compare_title'])
     fig_comp = go.Figure()
-    # Χρήση του 'Date' αντί για 'Year'
     fig_comp.add_trace(go.Scatter(x=df['Date'], y=df['BoG_Index'], name='Bank of Greece', line=dict(dash='dot', width=1.5, color='#0088C3'))) 
     fig_comp.add_trace(go.Scatter(x=df['Date'], y=df['SPI_Index'], name='Market Prices', line=dict(dash='dot', width=1.5, color='#EF4444'))) 
     fig_comp.add_trace(go.Scatter(x=df['Date'], y=df['ELSTAT_Cost'], name='Construction Cost', line=dict(dash='dot', width=1.5, color='#10B981'))) 
@@ -240,13 +244,13 @@ with tab1:
     fig_comp.update_layout(
         hovermode="x unified", 
         height=450, 
-        legend=dict(orientation="h", y=1.2), # Λίγο πιο πάνω το legend για να μην πέφτει στα κουμπιά 
+        legend=dict(orientation="h", y=1.2), 
         margin=dict(l=20, r=20, t=20, b=20), 
         paper_bgcolor='rgba(0,0,0,0)', 
         plot_bgcolor='rgba(0,0,0,0)', 
         font=dict(color=None),
         dragmode='pan',
-        xaxis=common_xaxis # Εφαρμογή των κουμπιών Range Selector
+        xaxis=common_xaxis # Εφαρμογή των ρυθμίσεων (δεξιά κουμπιά + όρια)
     )
     st.plotly_chart(fig_comp, use_container_width=True, config={'displayModeBar': False, 'scrollZoom': True})
 
