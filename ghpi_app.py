@@ -4,264 +4,156 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import base64
 import requests
-from datetime import timedelta
 
-# --- ΡΥΘΜΙΣΕΙΣ ΣΕΛΙΔΑΣ ---
+# --- 1. ΡΥΘΜΙΣΕΙΣ ΣΕΛΙΔΑΣ (ΠΡΕΠΕΙ ΝΑ ΕΙΝΑΙ ΠΡΩΤΟ) ---
 st.set_page_config(
     page_title="Δείκτης Τιμών Ακινήτων Ελλάδας (GHPI)",
     page_icon="🏛️",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="collapsed"
 )
 
-# --- CSS STYLE ---
+# --- 2. META TAGS ΓΙΑ SOCIAL MEDIA (WHATSAPP, FACEBOOK, LINKEDIN) ---
+# ΣΗΜΑΝΤΙΚΟ: Βάλε εδώ το RAW Link του λογοτύπου σου από το GitHub ή άλλο site
+LOGO_URL = "https://github.com/igiakoumakis/ghpi-website/blob/main/logo.png?raw=true" 
+# Αν δεν έχεις το link πρόχειρο, άσε αυτό το placeholder, αλλά δεν θα δείχνει εικόνα στο WhatsApp.
+
+meta_tags = f"""
+<head>
+    <meta property="og:title" content="Δείκτης Τιμών Ακινήτων Ελλάδας (GHPI)">
+    <meta property="og:description" content="Η επίσημη πορεία της Ελληνικής Κτηματαγοράς. Στατιστικά, Μακροοικονομικά και Αναλύσεις από την Giakoumakis Real Estate.">
+    <meta property="og:image" content="{LOGO_URL}">
+    <meta property="og:url" content="https://www.ghpi.gr">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+</head>
+"""
+st.markdown(meta_tags, unsafe_allow_html=True)
+
+# --- 3. CSS STYLE ---
 st.markdown("""
 <style>
+    /* Απόκρυψη στοιχείων Streamlit */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
     div.block-container { padding-top: 1rem; }
 
-    .main-title { font-size: 2.8rem; color: var(--text-color); font-weight: 800; margin-bottom: 0; line-height: 1.2; }
-    .subtitle { font-size: 1.5rem; color: #0088C3; font-weight: 600; margin-top: 5px; margin-bottom: 10px; }
-    .intro { font-size: 1.1rem; color: var(--text-color); opacity: 0.8; margin-bottom: 30px; font-style: italic; margin-top: 20px; }
+    /* Τυπογραφία */
+    .main-title { font-size: 2.5rem; color: #1f2937; font-weight: 800; margin-bottom: 0; line-height: 1.2; }
+    .subtitle { font-size: 1.4rem; color: #0088C3; font-weight: 600; margin-top: 5px; margin-bottom: 10px; }
+    .intro { font-size: 1.1rem; color: #4b5563; margin-bottom: 30px; font-style: italic; margin-top: 20px; }
     
+    /* Header Layout */
     .header-container { display: flex; flex-direction: row; align-items: center; justify-content: flex-start; }
-    .logo-img { height: 110px; margin-right: 25px; align-self: center; }
-    .title-container { display: flex; flex-direction: column; justify-content: center; text-align: left; }
-
+    .logo-img { height: 100px; margin-right: 25px; align-self: center; }
+    
+    /* Mobile Header */
     @media only screen and (max-width: 768px) {
         .header-container { flex-direction: column; align-items: center; text-align: center; margin-bottom: 20px; }
-        .logo-img { height: 90px; margin-right: 0; margin-bottom: 15px; }
-        .title-container { text-align: center; align-items: center; }
+        .logo-img { height: 80px; margin-right: 0; margin-bottom: 15px; }
         .main-title { font-size: 1.8rem; }
         .subtitle { font-size: 1.1rem; }
-        div.stRadio > div[role="radiogroup"] { justify-content: center !important; margin-bottom: 15px; }
     }
     
-    div.stRadio > div[role="radiogroup"] { flex-direction: row; justify-content: flex-end; }
+    /* Boxes & Cards */
+    .source-box { background-color: #f8fafc; padding: 15px; border-radius: 8px; border-left: 5px solid #003B71; margin-bottom: 10px; border: 1px solid #e2e8f0; }
+    .hero-container { background: linear-gradient(135deg, #003B71 0%, #001F3F 100%); color: white; padding: 30px; border-radius: 12px; text-align: center; margin-bottom: 40px; box-shadow: 0 4px 15px rgba(0, 59, 113, 0.3); }
+    .service-card { background-color: white; padding: 20px; border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.05); height: 100%; text-align: center; transition: transform 0.2s; }
+    .service-card:hover { transform: translateY(-3px); border-color: #0088C3; }
     
-    .source-box { background-color: var(--secondary-background-color); padding: 15px; border-radius: 8px; border-left: 5px solid #003B71; margin-bottom: 10px; border: 1px solid rgba(128, 128, 128, 0.2); }
-    
-    .hero-container { background: linear-gradient(135deg, #003B71 0%, #001F3F 100%); color: white; padding: 40px; border-radius: 15px; text-align: center; margin-bottom: 40px; box-shadow: 0 4px 15px rgba(0, 59, 113, 0.3); border: 1px solid rgba(255,255,255,0.1); }
-    .hero-title { font-size: 1.8rem; font-weight: 800; color: #ffffff; margin-bottom: 10px; }
-    .hero-subtitle { font-size: 1.2rem; font-weight: 600; color: #0088C3; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px;}
-    .hero-text { font-size: 1.1rem; line-height: 1.6; color: #e2e8f0; max-width: 800px; margin: 0 auto;}
-
-    .service-card { background-color: var(--secondary-background-color); padding: 25px; border-radius: 12px; border: 1px solid rgba(128, 128, 128, 0.2); box-shadow: 0 4px 6px rgba(0,0,0,0.05); height: 100%; text-align: center; transition: transform 0.2s; }
-    .service-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0, 136, 195, 0.2); border-color: #0088C3; }
-    .service-icon { font-size: 2.5rem; margin-bottom: 15px; }
-    .service-title { font-size: 1.2rem; font-weight: 700; color: var(--text-color); margin-bottom: 10px; }
-    .service-desc { font-size: 0.95rem; color: var(--text-color); opacity: 0.8; line-height: 1.5; }
-
-    div[data-testid="stMetric"] { background-color: var(--secondary-background-color); border: 1px solid rgba(128, 128, 128, 0.2); padding: 15px; border-radius: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-    
-    a { color: #0088C3; text-decoration: none; }
-    a:hover { text-decoration: underline; }
+    /* Metrics */
+    div[data-testid="stMetric"] { background-color: white; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
 </style>
 """, unsafe_allow_html=True)
 
-# --- LANGUAGE LOGIC ---
+# --- 4. LANGUAGE LOGIC ---
 if 'lang_initialized' not in st.session_state:
-    detected_index = 1 
-    try:
-        response = requests.get('http://ip-api.com/json/', timeout=2)
-        if response.status_code == 200:
-            data = response.json()
-            if data.get('countryCode') == 'GR': detected_index = 0
-            else: detected_index = 1
-    except: pass
-    st.session_state['lang_index'] = detected_index
+    st.session_state['lang_index'] = 0 # Default Greek
     st.session_state['lang_initialized'] = True
 
-top_col1, top_col2 = st.columns([4, 1])
-with top_col2:
-    lang_selection = st.radio("Language / Γλώσσα", ["🇬🇷 GR", "🇬🇧 EN"], index=st.session_state.get('lang_index', 1), horizontal=True, label_visibility="collapsed", key="lang_radio")
+col_h1, col_h2 = st.columns([4, 1])
+with col_h2:
+    lang_sel = st.radio("Language", ["🇬🇷 GR", "🇬🇧 EN"], index=st.session_state['lang_index'], horizontal=True, label_visibility="collapsed")
 
-if lang_selection == "🇬🇷 GR":
-    lang = 'el'
-    st.session_state['lang_index'] = 0
-else:
-    lang = 'en'
-    st.session_state['lang_index'] = 1
+lang = 'el' if lang_sel == "🇬🇷 GR" else 'en'
+st.session_state['lang_index'] = 0 if lang == 'el' else 1
 
-# --- CONTENTS (ENHANCED SEO & METHODOLOGY) ---
+# --- 5. CONTENT DICTIONARY ---
 content = {
     'el': {
         'title': 'Δείκτης Τιμών Ακινήτων Ελλάδας (GHPI)',
         'subtitle': 'από Γιακουμάκης Ακίνητα',
-        'intro_text': 'Ο επίσημος σύνθετος δείκτης για την πορεία της Ελληνικής Κτηματαγοράς.',
-        'tab_data': '📊 GHPI & Στατιστικά',
-        'tab_methodology': '📘 Μεθοδολογία & Ανάλυση',
-        'tab_macro': '📈 Μακροοικονομικά',
-        'tab_about': '🏢 Η Εταιρεία',
-        
-        # Stats & Charts
-        'stat_current': 'Τρέχουσα Τιμή (2025)', 'stat_yoy': 'Ετήσια Μεταβολή (1Y)', 'stat_5y': 'Μεταβολή 5ετίας (5Y)', 'stat_ath': 'Ιστορικό Υψηλό (ATH)', 'ath_desc': 'από το peak του 2008',
-        'chart_compare_title': 'Σύγκριση Πηγών: GHPI vs Επιμέρους Δείκτες', 'chart_yoy_title': 'Ετήσια Ποσοστιαία Μεταβολή (%)',
-        'table_title': 'Συνοπτικός Πίνακας', 'col_year': 'Έτος', 'col_ghpi': 'Δείκτης GHPI', 'col_yoy': 'Ετήσια Μεταβολή',
-        'full_table_title': 'Προβολή Πλήρων Δεδομένων (Όλοι οι Δείκτες)',
-        
-        # Macro Tab
-        'macro_intro': 'Συγκριτική ανάλυση βασικών δεικτών της Ελληνικής Οικονομίας σε σχέση με την Κτηματαγορά.',
-        'macro_c1_title': '1. Γενική Οικονομία: ΑΕΠ vs Χρηματιστήριο',
-        'macro_c2_title': '2. Προσφορά & Ζήτηση: Άδειες vs Συναλλαγές',
-        'macro_c3_title': '3. Ρευστότητα: Ξένες Επενδύσεις vs Στεγαστικά Δάνεια',
-        'macro_c4_title': '4. Πληθωρισμός vs Ακίνητα (Real Returns)',
-        'lbl_gdp': 'ΑΕΠ (Δις €)', 'lbl_inf': 'Πληθωρισμός (%)', 'lbl_ase': 'Γεν. Δείκτης ΧΑΑ', 'lbl_ghpi_yoy': 'Μεταβολή GHPI (%)',
-        'lbl_permits': 'Οικοδ. Άδειες (χιλ.)', 'lbl_fdi': 'Ξένες Επενδύσεις (FDI - εκ. €)', 'lbl_mort': 'Νέα Στεγαστικά (εκ. €)', 'lbl_trans': 'Συναλλαγές (χιλ.)',
-        'macro_table_title': 'Συγκεντρωτικός Πίνακας Μακροοικονομικών Δεικτών',
-
-        # --- UPDATED METHODOLOGY TEXTS ---
-        'method_title': 'Αναλυτική Μεθοδολογία & Σκεπτικό του Δείκτη GHPI',
-        
-        'meth_sec1_title': 'Γιατί είναι απαραίτητος ένας Σύνθετος Δείκτης;',
-        'meth_sec1_body': """
-        Οι δείκτες τιμών ακινήτων (House Price Indices - HPIs) αποτελούν θεμελιώδη εργαλεία για την κατανόηση της οικονομικής υγείας μιας χώρας. 
-        Επηρεάζουν τις αποφάσεις των επενδυτών, την πολιτική των τραπεζών και τον προγραμματισμό των κατασκευαστικών εταιρειών. 
-        Στην Ελλάδα, ωστόσο, η έλλειψη ενός κεντρικού, πλήρως διαφανούς μητρώου πραγματικών τιμών πώλησης δημιουργεί "θόρυβο" στην πληροφόρηση.
-        
-        Ο **GHPI (Giakoumakis House Price Index)** δημιουργήθηκε για να καλύψει αυτό το κενό. Αντί να βασίζεται σε μία μόνο πηγή, 
-        συνθέτει δεδομένα από τρεις διαφορετικές οπτικές γωνίες της αγοράς, προσφέροντας μια ολιστική και πιο αξιόπιστη εικόνα.
-        """,
-
-        'meth_sec2_title': 'Ανάλυση των Πηγών Δεδομένων (Sub-Indices)',
-        'meth_src1_t': '1. Τραπεζικές Εκτιμήσεις (Bank of Greece)',
-        'meth_src1_d': """
-        **Τι είναι:** Ο επίσημος δείκτης που βασίζεται στις εκτιμήσεις ακινήτων που πραγματοποιούν οι τράπεζες για την έκδοση δανείων.
-        \n**👍 Πλεονεκτήματα:** Υψηλή αξιοπιστία, πραγματοποιούνται από πιστοποιημένους εκτιμητές, μεγάλο δείγμα δεδομένων.
-        \n**👎 Μειονεκτήματα:** Οι εκτιμήσεις είναι συχνά συντηρητικές (χαμηλότερες της εμπορικής αξίας) και παρουσιάζουν χρονική υστέρηση (time lag) σε σχέση με την αγορά.
-        """,
-        
-        'meth_src2_t': '2. Ζητούμενες Τιμές (Market Asking Prices)',
-        'meth_src2_d': """
-        **Τι είναι:** Δεδομένα από μεγάλες πύλες αγγελιών (όπως το Spitogatos Network) που καταγράφουν τι ζητούν οι ιδιοκτήτες.
-        \n**👍 Πλεονεκτήματα:** Άμεση αποτύπωση του "κλίματος" και των προσδοκιών της αγοράς (Sentiment). Αντιδρά γρήγορα στις αλλαγές.
-        \n**👎 Μειονεκτήματα:** Η ζητούμενη τιμή σπάνια είναι η τιμή κλεισίματος (Closing Price). Συχνά περιέχει "καπέλο" διαπραγμάτευσης.
-        """,
-        
-        'meth_src3_t': '3. Κόστος Κατασκευής (Construction Cost - ELSTAT)',
-        'meth_src3_d': """
-        **Τι είναι:** Ο δείκτης κόστους υλικών και εργατικών για νέες κατοικίες από την ΕΛΣΤΑΤ.
-        \n**👍 Πλεονεκτήματα:** Αντικειμενικό, σκληρό δεδομένο. Δείχνει την "αξία αντικατάστασης" ενός ακινήτου.
-        \n**👎 Μειονεκτήματα:** Δεν λαμβάνει υπόψη την αξία της γης (οικόπεδο) ή την προσφορά και ζήτηση.
-        """,
-
-        'meth_sec3_title': 'Η Φόρμουλα του GHPI & Η Στάθμιση',
-        'meth_sec3_body': """
-        Επιλέξαμε μια σταθμισμένη προσέγγιση για να εξισορροπήσουμε τις αδυναμίες κάθε πηγής:
-        * **50% Τράπεζες:** Η μεγαλύτερη βαρύτητα δίνεται εδώ ως η πιο σταθερή και θεσμική βάση.
-        * **30% Αγορά (Αγγελίες):** Αρκετή βαρύτητα για να πιάσουμε την τάση, αλλά όχι κυρίαρχη για να αποφύγουμε τις "φούσκες" των ζητούμενων τιμών.
-        * **20% Κόστος:** Λειτουργεί ως άγκυρα λογικής. Οι τιμές δεν μπορούν μακροπρόθεσμα να πέσουν κάτω από το κόστος κατασκευής.
-        
-        **Γιατί Ετήσιος Δείκτης;**
-        Η αγορά ακινήτων είναι "αργή" (illiquid asset). Οι μηνιαίες διακυμάνσεις συχνά οφείλονται σε τυχαία γεγονότα ή εποχικότητα. 
-        Η ετήσια προσέγγιση φιλτράρει αυτόν τον θόρυβο και αναδεικνύει την πραγματική, μακροχρόνια τάση (Trend).
-        """,
-        
-        # ORIGINAL SOURCES
-        'sources_title': '📚 Πηγές Δεδομένων (Links)',
-        'source_1': '🏦 **Τράπεζα της Ελλάδος (Bank of Greece):** Δείκτες Τιμών Οικιστικών Ακινήτων (Πίνακας ΙΙ.1 - Στοιχεία από εκτιμήσεις τραπεζών).',
-        'source_2': '📈 **Spitogatos Network (SPI):** Spitogatos Property Index. Βάση δεδομένων ζητούμενων τιμών από αγγελίες ακινήτων.',
-        'source_3': '🏗️ **ΕΛΣΤΑΤ (Hellenic Statistical Authority):** Δείκτης Κόστους Υλικών Νέων Κτιρίων Κατοικιών.',
-
-        'hero_title': 'GIAKOUMAKIS REAL ESTATE', 'hero_subtitle': '50+ Χρόνια Εμπειρίας', 'hero_desc': 'Ολοκληρωμένες λύσεις ακινήτων από το 1970.',
-        'services_main_title': 'Οι Υπηρεσίες μας', 's1_t': 'Real Estate', 's1_d': 'Πωλήσεις & Ενοικιάσεις.', 's2_t': 'Μελέτες', 's2_d': 'Τοπογραφικά & Αρχιτεκτονικά.', 's3_t': 'Κατασκευές', 's3_d': 'Πολυτελείς κατοικίες.', 's4_t': 'Management', 's4_d': 'Διοίκηση έργων.', 's5_t': 'Ενέργεια', 's5_d': 'Αναβαθμίσεις.', 's6_t': 'Business', 's6_d': 'Τουριστική εκμετάλλευση.', 'visit_button': 'Επισκεφθείτε το giakoumakis.gr', 'footer': '© 2025 Giakoumakis Real Estate.'
+        'intro': 'Ο επίσημος σύνθετος δείκτης για την πορεία της Ελληνικής Κτηματαγοράς.',
+        'tabs': ['📊 GHPI & Στατιστικά', '📘 Μεθοδολογία', '📈 Μακροοικονομικά', '🏢 Η Εταιρεία'],
+        'kpi': ['Τρέχουσα Τιμή (2025)', 'Ετήσια Μεταβολή (1Y)', 'Μεταβολή 5ετίας (5Y)', 'Ιστορικό Υψηλό'],
+        'charts': ['Σύγκριση Πηγών: GHPI vs Επιμέρους Δείκτες', 'Ετήσια Ποσοστιαία Μεταβολή (%)'],
+        'table': ['Έτος', 'Δείκτης GHPI', 'Ετήσια Μεταβολή'],
+        'full_table': 'Προβολή Πλήρων Δεδομένων (Όλοι οι Δείκτες)',
+        'macro': {
+            'intro': 'Συγκριτική ανάλυση βασικών δεικτών της Ελληνικής Οικονομίας σε σχέση με την Κτηματαγορά.',
+            'titles': ['1. Γενική Οικονομία: ΑΕΠ vs Χρηματιστήριο', '2. Προσφορά & Ζήτηση: Άδειες vs Συναλλαγές', '3. Ρευστότητα: Ξένες Επενδύσεις vs Στεγαστικά', '4. Πληθωρισμός vs Ακίνητα'],
+            'labels': ['ΑΕΠ (€ Δις)', 'Πληθωρισμός (%)', 'Δείκτης ΧΑΑ', 'GHPI Μεταβολή (%)', 'Οικοδ. Άδειες (χιλ.)', 'Ξένες Επενδύσεις (εκ. €)', 'Νέα Στεγαστικά (εκ. €)', 'Συναλλαγές (χιλ.)'],
+            'table_t': 'Συγκεντρωτικός Πίνακας Μακροοικονομικών'
+        },
+        'method': {
+            't': 'Αναλυτική Μεθοδολογία & Σκεπτικό',
+            's1': 'Ο GHPI συνθέτει δεδομένα από τρεις διαφορετικές πηγές για να προσφέρει μια ολιστική εικόνα της αγοράς.',
+            's2': 'Η Φόρμουλα: GHPI = (0.5 x Τράπεζες) + (0.3 x Αγορά) + (0.2 x Κόστος)',
+            'src': ['1. Τραπεζικές Εκτιμήσεις (BoG)', 'Επίσημος δείκτης. Υψηλή αξιοπιστία, αλλά συντηρητικός.', '2. Ζητούμενες Τιμές (Market)', 'Άμεση αποτύπωση τάσης, αλλά περιέχει "καπέλο" διαπραγμάτευσης.', '3. Κόστος Κατασκευής (ELSTAT)', 'Αντικειμενικό δεδομένο κόστους αντικατάστασης.'],
+            'links': 'Πηγές Δεδομένων: Τράπεζα της Ελλάδος, Spitogatos Network, ΕΛΣΤΑΤ.'
+        },
+        'about': {
+            'hero_t': 'GIAKOUMAKIS REAL ESTATE', 'hero_s': '50+ Χρόνια Εμπειρίας', 'hero_d': 'Ολοκληρωμένες λύσεις ακινήτων από το 1970.',
+            'srv': ['Real Estate', 'Πωλήσεις & Ενοικιάσεις', 'Μελέτες', 'Τοπογραφικά & Στατικά', 'Κατασκευές', 'Πολυτελείς κατοικίες', 'Management', 'Διοίκηση έργων', 'Ενέργεια', 'Αναβαθμίσεις', 'Business', 'Τουριστική εκμετάλλευση'],
+            'btn': 'Επισκεφθείτε το giakoumakis.gr', 'foot': '© 2025 Giakoumakis Real Estate.'
+        }
     },
     'en': {
         'title': 'Greece House Price Index (GHPI)',
         'subtitle': 'by Giakoumakis Real Estate',
-        'intro_text': 'The official composite index tracking the Greek Real Estate Market.',
-        'tab_data': '📊 GHPI & Stats',
-        'tab_methodology': '📘 Methodology & Analysis',
-        'tab_macro': '📈 Macro Analysis',
-        'tab_about': '🏢 About Us',
-        
-        'stat_current': 'Current Value (2025)', 'stat_yoy': '1-Year Change (YoY)', 'stat_5y': '5-Year Change', 'stat_ath': 'All-Time High (ATH)', 'ath_desc': 'from 2008 peak',
-        'chart_compare_title': 'Source Comparison: GHPI vs Sub-Indices', 'chart_yoy_title': 'Annual Percentage Change (%)',
-        'table_title': 'Summary Table', 'col_year': 'Year', 'col_ghpi': 'GHPI Value', 'col_yoy': 'YoY Change',
-        'full_table_title': 'View Full Source Data (All Indices)',
-        
-        'macro_intro': 'Comparative analysis of key Greek Economic indicators vs Real Estate market.',
-        'macro_c1_title': '1. General Economy: GDP vs Stock Market',
-        'macro_c2_title': '2. Supply & Demand: Permits vs Transactions',
-        'macro_c3_title': '3. Liquidity: Foreign Investment (FDI) vs Mortgages',
-        'macro_c4_title': '4. Inflation vs Real Estate (Real Returns)',
-        'lbl_gdp': 'GDP (Billion €)', 'lbl_inf': 'Inflation (%)', 'lbl_ase': 'ASE Index', 'lbl_ghpi_yoy': 'GHPI Change (%)',
-        'lbl_permits': 'Build. Permits (thous.)', 'lbl_fdi': 'FDI (Real Estate - M€)', 'lbl_mort': 'New Mortgages (M€)', 'lbl_trans': 'Transactions (thous.)',
-        'macro_table_title': 'Consolidated Macroeconomic Data Table',
-
-        # --- UPDATED METHODOLOGY TEXTS ---
-        'method_title': 'Detailed Methodology & GHPI Framework',
-        
-        'meth_sec1_title': 'Why a Composite Index is Necessary?',
-        'meth_sec1_body': """
-        House Price Indices (HPIs) are fundamental tools for understanding a country's economic health. 
-        They influence investor decisions, banking policies, and developer planning. 
-        However, in Greece, the lack of a centralized, fully transparent registry of actual transaction prices creates "noise" in the data.
-        
-        The **GHPI (Giakoumakis House Price Index)** was created to bridge this gap. Instead of relying on a single source, 
-        it synthesizes data from three different market perspectives, offering a holistic and more reliable view.
-        """,
-
-        'meth_sec2_title': 'Analysis of Data Sources (Sub-Indices)',
-        'meth_src1_t': '1. Bank Valuations (Bank of Greece)',
-        'meth_src1_d': """
-        **What it is:** The official index based on property appraisals conducted by banks for mortgage purposes.
-        \n**👍 Pros:** High reliability, conducted by certified valuers, large dataset.
-        \n**👎 Cons:** Valuations are often conservative (below market value) and suffer from a time lag compared to the market.
-        """,
-        
-        'meth_src2_t': '2. Asking Prices (Market Sentiment)',
-        'meth_src2_d': """
-        **What it is:** Data from major listing portals (e.g., Spitogatos) recording what owners are asking for.
-        \n**👍 Pros:** Immediate reflection of market "sentiment" and expectations. Reacts quickly to changes.
-        \n**👎 Cons:** Asking price is rarely the Closing Price. It often contains a negotiation "premium" or bubble tendencies.
-        """,
-        
-        'meth_src3_t': '3. Construction Cost (ELSTAT)',
-        'meth_src3_d': """
-        **What it is:** The index of material and labor costs for new dwellings provided by the Statistical Authority.
-        \n**👍 Pros:** Objective, hard data. Shows the "replacement cost" of a property.
-        \n**👎 Cons:** Does not account for land value or supply/demand dynamics.
-        """,
-
-        'meth_sec3_title': 'The GHPI Formula & Weighting Strategy',
-        'meth_sec3_body': """
-        We chose a weighted approach to balance the weaknesses of each source:
-        * **50% Banks:** Given the highest weight as the most stable, institutional baseline.
-        * **30% Market (Listings):** Significant enough to capture trends, but not dominant to avoid asking-price volatility.
-        * **20% Cost:** Acts as a logic anchor. Prices cannot stay below construction costs in the long run.
-        
-        **Why an Annual Index?**
-        Real estate is an illiquid asset. Monthly fluctuations are often due to random events or seasonality. 
-        An annual approach filters out this noise and highlights the true, long-term Trend.
-        """,
-        
-        # ORIGINAL SOURCES
-        'sources_title': '📚 Data Sources (Links)',
-        'source_1': '🏦 **Bank of Greece:** Index of Apartment Prices.',
-        'source_2': '📈 **Spitogatos Network:** Asking prices database.',
-        'source_3': '🏗️ **ELSTAT:** Material Costs Index.',
-
-        'hero_title': 'GIAKOUMAKIS REAL ESTATE', 'hero_subtitle': '50+ Years of Experience', 'hero_desc': 'Integrated real estate solutions since 1970.',
-        'services_main_title': 'Our Services', 's1_t': 'Real Estate', 's1_d': 'Sales & Rentals.', 's2_t': 'Engineering', 's2_d': 'Topographical & Structural.', 's3_t': 'Construction', 's3_d': 'Luxury development.', 's4_t': 'Management', 's4_d': 'Project administration.', 's5_t': 'Energy', 's5_d': 'Efficiency solutions.', 's6_t': 'Business', 's6_d': 'Hospitality operations.', 'visit_button': 'Visit giakoumakis.gr', 'footer': '© 2025 Giakoumakis Real Estate.'
+        'intro': 'The official composite index tracking the Greek Real Estate Market.',
+        'tabs': ['📊 GHPI & Stats', '📘 Methodology', '📈 Macro Analysis', '🏢 About Us'],
+        'kpi': ['Current Value (2025)', '1-Year Change (YoY)', '5-Year Change', 'All-Time High'],
+        'charts': ['Source Comparison: GHPI vs Sub-Indices', 'Annual Percentage Change (%)'],
+        'table': ['Year', 'GHPI Value', 'YoY Change'],
+        'full_table': 'View Full Source Data (All Indices)',
+        'macro': {
+            'intro': 'Comparative analysis of key Greek Economic indicators vs Real Estate market.',
+            'titles': ['1. Economy: GDP vs Stock Market', '2. Supply & Demand: Permits vs Transactions', '3. Liquidity: FDI vs Mortgages', '4. Inflation vs Real Estate'],
+            'labels': ['GDP (€ Bn)', 'Inflation (%)', 'ASE Index', 'GHPI Change (%)', 'Build. Permits (k)', 'FDI (Real Estate €M)', 'New Mortgages (€M)', 'Transactions (k)'],
+            'table_t': 'Consolidated Macroeconomic Data Table'
+        },
+        'method': {
+            't': 'Detailed Methodology',
+            's1': 'GHPI synthesizes data from three sources to provide a holistic market view.',
+            's2': 'Formula: GHPI = (0.5 x Banks) + (0.3 x Market) + (0.2 x Cost)',
+            'src': ['1. Bank Valuations (BoG)', 'Official index. Reliable but conservative.', '2. Asking Prices (Market)', 'Fast sentiment check but includes premiums.', '3. Construction Cost (ELSTAT)', 'Objective replacement cost data.'],
+            'links': 'Data Sources: Bank of Greece, Spitogatos Network, ELSTAT.'
+        },
+        'about': {
+            'hero_t': 'GIAKOUMAKIS REAL ESTATE', 'hero_s': '50+ Years of Experience', 'hero_d': 'Integrated real estate solutions since 1970.',
+            'srv': ['Real Estate', 'Sales & Rentals', 'Engineering', 'Topographical & Structural', 'Construction', 'Luxury development', 'Management', 'Project administration', 'Energy', 'Efficiency solutions', 'Business', 'Hospitality operations'],
+            'btn': 'Visit giakoumakis.gr', 'foot': '© 2025 Giakoumakis Real Estate.'
+        }
     }
 }
-text = content[lang]
+t = content[lang]
 
-# --- HEADER ---
-with top_col1:
+# --- 6. DISPLAY HEADER ---
+with col_h1:
     logo_html = ""
     try:
         with open("logo.png", "rb") as f:
             encoded_img = base64.b64encode(f.read()).decode()
         logo_html = f'<img src="data:image/png;base64,{encoded_img}" class="logo-img">'
     except: pass
-    st.markdown(f"""<div class="header-container">{logo_html}<div class="title-container"><div class="main-title">{text["title"]}</div><div class="subtitle">{text["subtitle"]}</div></div></div>""", unsafe_allow_html=True)
+    st.markdown(f"""<div class="header-container">{logo_html}<div class="title-container"><div class="main-title">{t["title"]}</div><div class="subtitle">{t["subtitle"]}</div></div></div>""", unsafe_allow_html=True)
 
-st.markdown(f'<div class="intro">{text["intro_text"]}</div>', unsafe_allow_html=True)
+st.markdown(f'<div class="intro">{t["intro"]}</div>', unsafe_allow_html=True)
 
-# --- DATA ENGINE (GHPI) ---
+# --- 7. DATA ENGINE ---
+# GHPI Data
 data = {
     'Year': list(range(2000, 2026)),
     'BoG_Index': [58, 66, 75, 80, 85, 92, 98, 102, 101, 97, 92, 87, 76, 68, 63, 60, 59.5, 59, 60, 64.5, 67, 72, 80, 91, 99.5, 105],
@@ -269,262 +161,129 @@ data = {
     'ELSTAT_Cost': [70, 72, 75, 78, 82, 86, 90, 93, 96, 98, 100, 101, 100, 98, 96, 95, 94, 95, 96, 97, 96.5, 100, 110, 118, 125, 129]
 }
 df = pd.DataFrame(data)
-df['Date'] = pd.to_datetime(df['Year'], format='%Y')
-
 df['GHPI'] = (df['BoG_Index'] * 0.50) + (df['SPI_Index'] * 0.30) + (df['ELSTAT_Cost'] * 0.20)
 df['GHPI'] = df['GHPI'].round(1)
 df['YoY_Change'] = df['GHPI'].pct_change() * 100
 
-# --- DATA ENGINE (MACROECONOMIC) ---
+# Macro Data
 macro_data = {
     'Year': list(range(2000, 2026)),
-    'GDP_Billion': [141, 152, 163, 178, 193, 199, 217, 232, 242, 237, 226, 207, 191, 180, 178, 176, 174, 177, 180, 183, 165, 181, 206, 220, 235, 245],
+    'GDP': [141, 152, 163, 178, 193, 199, 217, 232, 242, 237, 226, 207, 191, 180, 178, 176, 174, 177, 180, 183, 165, 181, 206, 220, 235, 245],
     'Inflation': [3.2, 3.4, 3.6, 3.5, 2.9, 3.5, 3.2, 2.9, 4.2, 1.2, 4.7, 3.3, 1.5, -0.9, -1.3, -1.7, -0.8, 1.1, 0.6, 0.3, -1.2, 1.2, 9.6, 3.5, 2.9, 2.5],
-    'ASE_Index': [3400, 2600, 1750, 2260, 2790, 3540, 4400, 5178, 1786, 2196, 1413, 680, 907, 1162, 826, 631, 643, 802, 613, 916, 809, 893, 929, 1293, 1420, 1510],
-    'Permits_Thous': [75, 82, 85, 89, 82, 96, 88, 79, 65, 56, 48, 32, 25, 16, 13, 12, 12.5, 13, 15, 17, 19, 23, 25, 27, 29, 31],
-    'FDI_RealEstate_M': [100, 150, 180, 250, 300, 450, 900, 1100, 950, 700, 300, 150, 100, 250, 400, 600, 800, 1100, 1300, 1450, 900, 1100, 1975, 2100, 2300, 2500],
-    'Mortgages_New_M': [4500, 6000, 8500, 11000, 13500, 15000, 16000, 15500, 11000, 6000, 3500, 1500, 800, 500, 450, 400, 450, 500, 600, 750, 800, 1000, 1200, 1300, 1500, 1700],
-    'Transactions_Thous': [150, 165, 170, 160, 155, 175, 160, 145, 110, 85, 70, 50, 40, 35, 30, 38, 45, 55, 65, 75, 60, 75, 85, 95, 100, 105]
+    'ASE': [3400, 2600, 1750, 2260, 2790, 3540, 4400, 5178, 1786, 2196, 1413, 680, 907, 1162, 826, 631, 643, 802, 613, 916, 809, 893, 929, 1293, 1420, 1510],
+    'Permits': [75, 82, 85, 89, 82, 96, 88, 79, 65, 56, 48, 32, 25, 16, 13, 12, 12.5, 13, 15, 17, 19, 23, 25, 27, 29, 31],
+    'FDI': [100, 150, 180, 250, 300, 450, 900, 1100, 950, 700, 300, 150, 100, 250, 400, 600, 800, 1100, 1300, 1450, 900, 1100, 1975, 2100, 2300, 2500],
+    'Mortgages': [4500, 6000, 8500, 11000, 13500, 15000, 16000, 15500, 11000, 6000, 3500, 1500, 800, 500, 450, 400, 450, 500, 600, 750, 800, 1000, 1200, 1300, 1500, 1700],
+    'Transactions': [150, 165, 170, 160, 155, 175, 160, 145, 110, 85, 70, 50, 40, 35, 30, 38, 45, 55, 65, 75, 60, 75, 85, 95, 100, 105]
 }
-df_macro = pd.DataFrame(macro_data)
-df_macro['Date'] = pd.to_datetime(df_macro['Year'], format='%Y')
-df_macro['GHPI_YoY'] = df['YoY_Change']
-
-min_date = df['Date'].min()
-max_date = df['Date'].max()
+df_m = pd.DataFrame(macro_data)
 
 # KPI Calcs
-latest_val, prev_year_val = df['GHPI'].iloc[-1], df['GHPI'].iloc[-2]
-yoy_pct, yoy_diff = df['YoY_Change'].iloc[-1], latest_val - prev_year_val
-five_years_ago_val = df['GHPI'].iloc[-6]
-five_y_pct, five_y_diff = ((latest_val - five_years_ago_val) / five_years_ago_val) * 100, latest_val - five_years_ago_val
-ath_val = df['GHPI'].max()
-diff_from_ath = latest_val - ath_val 
+cur_val = df['GHPI'].iloc[-1]
+yoy_val = df['YoY_Change'].iloc[-1]
+yoy_diff = cur_val - df['GHPI'].iloc[-2]
+five_y_val = ((cur_val - df['GHPI'].iloc[-6]) / df['GHPI'].iloc[-6]) * 100
+five_y_diff = cur_val - df['GHPI'].iloc[-6]
+ath = df['GHPI'].max()
 
-# --- COMMON CHART SETTINGS ---
-common_xaxis = dict(
-    type="date",
-    range=[min_date, max_date], 
-    fixedrange=True, # Lock Zoom
-    rangeselector=dict(
-        buttons=list([
-            dict(count=5, label="5Y", step="year", stepmode="backward"),
-            dict(count=10, label="10Y", step="year", stepmode="backward"),
-            dict(step="all", label="MAX")
-        ]),
-        bgcolor='#f0f2f6',
-        activecolor='#d1d5db', # Light Grey active color
-        font=dict(color='black'), # Force black text
-        x=1, 
-        y=1.2,
-        xanchor='right'
-    )
-)
+# --- 8. TABS ---
+tab1, tab2, tab3, tab4 = st.tabs(t['tabs'])
 
-no_zoom_config = {
-    'displayModeBar': False, 
-    'scrollZoom': False,  
-    'doubleClick': False, 
-    'showTips': False
-}
-
-# --- TABS ---
-tab1, tab2, tab3, tab4 = st.tabs([f"{text['tab_data']}", f"{text['tab_methodology']}", f"{text['tab_macro']}", f"{text['tab_about']}"])
-
-# === TAB 1: DATA & CHARTS ===
+# === TAB 1: DATA ===
 with tab1:
-    kpi1, kpi2, kpi3, kpi4 = st.columns(4)
-    with kpi1: st.metric(label=text['stat_current'], value=f"{latest_val}", delta=None)
-    with kpi2: st.metric(label=text['stat_yoy'], value=f"{yoy_pct:.1f}%", delta=f"{yoy_diff:.1f}")
-    with kpi3: st.metric(label=text['stat_5y'], value=f"{five_y_pct:.1f}%", delta=f"{five_y_diff:.1f}")
-    with kpi4: st.metric(label=text['stat_ath'], value=f"{ath_val}", delta=f"{diff_from_ath:.1f}", delta_color="normal")
-    st.caption(f"* {text['stat_ath']}: {text['ath_desc']}")
+    k1, k2, k3, k4 = st.columns(4)
+    k1.metric(t['kpi'][0], f"{cur_val}")
+    k2.metric(t['kpi'][1], f"{yoy_val:.1f}%", f"{yoy_diff:.1f}")
+    k3.metric(t['kpi'][2], f"{five_y_val:.1f}%", f"{five_y_diff:.1f}")
+    k4.metric(t['kpi'][3], f"{ath}", f"{cur_val-ath:.1f}")
     st.divider()
 
-    st.subheader(text['chart_compare_title'])
+    st.subheader(t['charts'][0])
     fig_comp = go.Figure()
-    fig_comp.add_trace(go.Scatter(x=df['Date'], y=df['BoG_Index'], name='Bank of Greece', line=dict(dash='dot', width=1.5, color='#0088C3'))) 
-    fig_comp.add_trace(go.Scatter(x=df['Date'], y=df['SPI_Index'], name='Market Prices', line=dict(dash='dot', width=1.5, color='#EF4444'))) 
-    fig_comp.add_trace(go.Scatter(x=df['Date'], y=df['ELSTAT_Cost'], name='Construction Cost', line=dict(dash='dot', width=1.5, color='#10B981'))) 
-    fig_comp.add_trace(go.Scatter(x=df['Date'], y=df['GHPI'], name='GHPI', line=dict(color='#003B71', width=4))) 
-    
-    fig_comp.update_layout(
-        hovermode="x unified", height=450, legend=dict(orientation="h", y=1.2), 
-        margin=dict(l=20, r=20, t=20, b=20), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color=None),
-        dragmode=False, xaxis=common_xaxis, yaxis=dict(fixedrange=True) 
-    )
-    st.plotly_chart(fig_comp, use_container_width=True, config=no_zoom_config)
+    fig_comp.add_trace(go.Scatter(x=df['Year'], y=df['BoG_Index'], name='BoG', line=dict(dash='dot', width=1.5, color='#0088C3')))
+    fig_comp.add_trace(go.Scatter(x=df['Year'], y=df['SPI_Index'], name='Market', line=dict(dash='dot', width=1.5, color='#EF4444')))
+    fig_comp.add_trace(go.Scatter(x=df['Year'], y=df['ELSTAT_Cost'], name='Cost', line=dict(dash='dot', width=1.5, color='#10B981')))
+    fig_comp.add_trace(go.Scatter(x=df['Year'], y=df['GHPI'], name='GHPI', line=dict(color='#003B71', width=4)))
+    fig_comp.update_layout(hovermode="x unified", height=450, margin=dict(l=20,r=20,t=20,b=20), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+    st.plotly_chart(fig_comp, use_container_width=True)
 
-    st.subheader(text['chart_yoy_title'])
+    st.subheader(t['charts'][1])
     colors = ['#EF4444' if x < 0 else '#10B981' for x in df['YoY_Change']]
-    fig_bar = go.Figure(go.Bar(x=df['Date'], y=df['YoY_Change'], marker_color=colors, text=df['YoY_Change'].apply(lambda x: f'{x:.1f}%' if pd.notnull(x) else ''), textposition='outside'))
-    fig_bar.update_layout(
-        height=350, showlegend=False, margin=dict(l=20, r=20, t=20, b=20), 
-        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color=None),
-        dragmode=False, xaxis=common_xaxis, yaxis=dict(fixedrange=True)
-    )
-    st.plotly_chart(fig_bar, use_container_width=True, config=no_zoom_config)
-    
-    st.divider()
-    st.subheader(text['table_title'])
-    table_df = df[['Year', 'GHPI', 'YoY_Change']].sort_values(by='Year', ascending=False)
-    st.dataframe(table_df, column_config={"Year": st.column_config.NumberColumn(text['col_year'], format="%d"), "GHPI": st.column_config.NumberColumn(text['col_ghpi'], format="%.1f"), "YoY_Change": st.column_config.NumberColumn(text['col_yoy'], format="%.1f%%")}, use_container_width=True, hide_index=True, height=400)
-    
-    with st.expander(f"📂 {text['full_table_title']}"):
-        full_df_display = df.sort_values(by='Year', ascending=False)
-        st.dataframe(
-            full_df_display,
-            column_config={
-                "Year": st.column_config.NumberColumn("Year / Έτος", format="%d"),
-                "BoG_Index": st.column_config.NumberColumn("Bank of Greece", format="%.1f"),
-                "SPI_Index": st.column_config.NumberColumn("Market Prices", format="%.1f"),
-                "ELSTAT_Cost": st.column_config.NumberColumn("Constr. Cost", format="%.1f"),
-                "GHPI": st.column_config.NumberColumn("GHPI", format="%.1f"),
-                "YoY_Change": st.column_config.NumberColumn("YoY %", format="%.1f%%")
-            },
-            use_container_width=True,
-            hide_index=True
-        )
+    fig_bar = go.Figure(go.Bar(x=df['Year'], y=df['YoY_Change'], marker_color=colors))
+    fig_bar.update_layout(height=350, margin=dict(l=20,r=20,t=20,b=20), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+    st.plotly_chart(fig_bar, use_container_width=True)
 
-# === TAB 2: METHODOLOGY (UPDATED LAYOUT) ===
+    with st.expander(t['full_table']):
+        st.dataframe(df.sort_values(by='Year', ascending=False), use_container_width=True, hide_index=True)
+
+# === TAB 2: METHODOLOGY ===
 with tab2:
-    st.header(text['method_title'])
-    
-    # Section 1: Introduction
-    st.subheader(text['meth_sec1_title'])
-    st.markdown(text['meth_sec1_body'])
-    st.divider()
-
-    # Section 2: Formula & Visualization
-    st.subheader(text['meth_sec3_title'])
-    st.markdown(text['meth_sec3_body'])
-    st.info("The Formula / Ο Τύπος:")
+    st.header(t['method']['t'])
+    st.info(t['method']['s1'])
     st.latex(r'''GHPI_t = (0.5 \times I_{Bank}) + (0.3 \times I_{Market}) + (0.2 \times I_{Cost})''')
-    st.divider()
     
-    # Section 3: Deep Dive into Sources (Columns)
-    st.subheader(text['meth_sec2_title'])
     c1, c2, c3 = st.columns(3)
+    c1.markdown(f"#### {t['method']['src'][0]}")
+    c1.success(t['method']['src'][1])
+    c2.markdown(f"#### {t['method']['src'][2]}")
+    c2.warning(t['method']['src'][3])
+    c3.markdown(f"#### {t['method']['src'][4]}")
+    c3.info(t['method']['src'][5])
     
-    with c1:
-        st.markdown(f"#### {text['meth_src1_t']}")
-        st.info(text['meth_src1_d'])
-        
-    with c2:
-        st.markdown(f"#### {text['meth_src2_t']}")
-        st.warning(text['meth_src2_d'])
-        
-    with c3:
-        st.markdown(f"#### {text['meth_src3_t']}")
-        st.success(text['meth_src3_d'])
-        
-    st.divider()
-    
-    # ADDED BACK: SOURCES BOX
-    st.subheader(text['sources_title'])
-    st.markdown(f"""<div class="source-box">{text['source_1']}<br><br>{text['source_2']}<br><br>{text['source_3']}</div>""", unsafe_allow_html=True)
-    
-    st.caption("Data sources are updated annually to ensure consistency and eliminate seasonal noise.")
+    st.markdown("---")
+    st.caption(t['method']['links'])
 
-# === TAB 3: MACROECONOMIC ANALYSIS ===
+# === TAB 3: MACRO ===
 with tab3:
-    st.header(f"📊 {text['tab_macro']}")
-    st.markdown(f"*{text['macro_intro']}*")
+    st.header(t['tabs'][2])
+    st.markdown(f"*{t['macro']['intro']}*")
+
+    # Chart 1
+    st.subheader(t['macro']['titles'][0])
+    f1 = make_subplots(specs=[[{"secondary_y": True}]])
+    f1.add_trace(go.Bar(x=df_m['Year'], y=df_m['GDP'], name=t['macro']['labels'][0], marker_color='#003B71', opacity=0.7), secondary_y=False)
+    f1.add_trace(go.Scatter(x=df_m['Year'], y=df_m['ASE'], name=t['macro']['labels'][2], line=dict(color='#FFA500', width=3)), secondary_y=True)
+    f1.update_layout(height=400, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+    st.plotly_chart(f1, use_container_width=True)
+
+    # Chart 2
+    st.subheader(t['macro']['titles'][1])
+    f2 = go.Figure()
+    f2.add_trace(go.Bar(x=df_m['Year'], y=df_m['Transactions'], name=t['macro']['labels'][7], marker_color='#60A5FA'))
+    f2.add_trace(go.Scatter(x=df_m['Year'], y=df_m['Permits'], name=t['macro']['labels'][4], line=dict(color='#0088C3', width=3)))
+    f2.update_layout(height=400, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+    st.plotly_chart(f2, use_container_width=True)
+
+    # Chart 3
+    st.subheader(t['macro']['titles'][2])
+    f3 = go.Figure()
+    f3.add_trace(go.Bar(x=df_m['Year'], y=df_m['FDI'], name=t['macro']['labels'][5], marker_color='#059669'))
+    f3.add_trace(go.Scatter(x=df_m['Year'], y=df_m['Mortgages'], name=t['macro']['labels'][6], line=dict(color='#F43F5E', width=3)))
+    f3.update_layout(height=400, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+    st.plotly_chart(f3, use_container_width=True)
     
-    # --- CHART 1 ---
-    st.subheader(text['macro_c1_title'])
-    fig_macro1 = make_subplots(specs=[[{"secondary_y": True}]])
-    fig_macro1.add_trace(go.Bar(x=df_macro['Date'], y=df_macro['GDP_Billion'], name=text['lbl_gdp'], marker_color='#003B71', opacity=0.7), secondary_y=False)
-    fig_macro1.add_trace(go.Scatter(x=df_macro['Date'], y=df_macro['ASE_Index'], name=text['lbl_ase'], line=dict(color='#FFA500', width=3)), secondary_y=True)
-    fig_macro1.update_layout(
-        height=400, hovermode="x unified", legend=dict(orientation="h", y=1.2), 
-        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color=None),
-        dragmode=False, xaxis=common_xaxis, yaxis=dict(fixedrange=True), yaxis2=dict(fixedrange=True)
-    )
-    fig_macro1.update_yaxes(title_text="GDP (€ Bn)", secondary_y=False)
-    fig_macro1.update_yaxes(title_text="ASE Index Points", secondary_y=True)
-    st.plotly_chart(fig_macro1, use_container_width=True, config=no_zoom_config)
+    # Chart 4
+    st.subheader(t['macro']['titles'][3])
+    f4 = go.Figure()
+    f4.add_trace(go.Scatter(x=df_m['Year'], y=df_m['Inflation'], name=t['macro']['labels'][1], line=dict(color='#EF4444', dash='dot')))
+    f4.add_trace(go.Bar(x=df['Year'], y=df['YoY_Change'], name=t['macro']['labels'][3], marker_color='#10B981'))
+    f4.update_layout(height=400, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+    st.plotly_chart(f4, use_container_width=True)
     
-    st.divider()
+    with st.expander(t['macro']['table_t']):
+        st.dataframe(df_m.sort_values(by='Year', ascending=False), use_container_width=True, hide_index=True)
 
-    # --- CHART 2 ---
-    st.subheader(text['macro_c2_title'])
-    fig_macro_act = go.Figure()
-    fig_macro_act.add_trace(go.Bar(x=df_macro['Date'], y=df_macro['Transactions_Thous'], name=text['lbl_trans'], marker_color='#60A5FA', opacity=0.6))
-    fig_macro_act.add_trace(go.Scatter(x=df_macro['Date'], y=df_macro['Permits_Thous'], name=text['lbl_permits'], line=dict(color='#0088C3', width=3)))
-    fig_macro_act.update_layout(
-        height=400, hovermode="x unified", legend=dict(orientation="h", y=1.2), 
-        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color=None), 
-        yaxis_title="Units (Thousands)",
-        dragmode=False, xaxis=common_xaxis, yaxis=dict(fixedrange=True)
-    )
-    st.plotly_chart(fig_macro_act, use_container_width=True, config=no_zoom_config)
-
-    st.divider()
-
-    # --- CHART 3 ---
-    st.subheader(text['macro_c3_title'])
-    fig_macro_liq = go.Figure()
-    fig_macro_liq.add_trace(go.Bar(x=df_macro['Date'], y=df_macro['FDI_RealEstate_M'], name=text['lbl_fdi'], marker_color='#059669', opacity=0.7))
-    fig_macro_liq.add_trace(go.Scatter(x=df_macro['Date'], y=df_macro['Mortgages_New_M'], name=text['lbl_mort'], line=dict(color='#F43F5E', width=3)))
-    fig_macro_liq.update_layout(
-        height=400, hovermode="x unified", legend=dict(orientation="h", y=1.2), 
-        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color=None), 
-        yaxis_title="Amount (Million €)",
-        dragmode=False, xaxis=common_xaxis, yaxis=dict(fixedrange=True)
-    )
-    st.plotly_chart(fig_macro_liq, use_container_width=True, config=no_zoom_config)
-    
-    st.divider()
-
-    # --- CHART 4 ---
-    st.subheader(text['macro_c4_title'])
-    fig_macro2 = go.Figure()
-    fig_macro2.add_trace(go.Scatter(x=df_macro['Date'], y=df_macro['Inflation'], name=text['lbl_inf'], line=dict(color='#EF4444', width=2, dash='dot')))
-    fig_macro2.add_trace(go.Bar(x=df_macro['Date'], y=df_macro['GHPI_YoY'], name=text['lbl_ghpi_yoy'], marker_color='#10B981', opacity=0.8))
-    fig_macro2.update_layout(
-        height=400, hovermode="x unified", legend=dict(orientation="h", y=1.2), 
-        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color=None), 
-        yaxis_title="Percentage (%)",
-        dragmode=False, xaxis=common_xaxis, yaxis=dict(fixedrange=True)
-    )
-    st.plotly_chart(fig_macro2, use_container_width=True, config=no_zoom_config)
-
-    # --- TABLE ---
-    with st.expander(f"📂 {text['macro_table_title']}", expanded=False):
-        macro_display = df_macro.drop(columns=['Date', 'GHPI_YoY']).sort_values(by='Year', ascending=False)
-        st.dataframe(
-            macro_display,
-            column_config={
-                "Year": st.column_config.NumberColumn(text['col_year'], format="%d"),
-                "GDP_Billion": st.column_config.NumberColumn("GDP (€Bn)", format="€ %.0f B"),
-                "Inflation": st.column_config.NumberColumn("Inflation", format="%.1f%%"),
-                "ASE_Index": st.column_config.NumberColumn("ASE", format="%d"),
-                "Transactions_Thous": st.column_config.NumberColumn("Trans.", format="%.0f k"),
-                "Permits_Thous": st.column_config.NumberColumn("Permits", format="%.1f k"),
-                "FDI_RealEstate_M": st.column_config.NumberColumn("FDI (RE)", format="€ %.0f M"),
-                "Mortgages_New_M": st.column_config.NumberColumn("Mortgages", format="€ %.0f M"),
-            },
-            use_container_width=True,
-            hide_index=True
-        )
-
-# === TAB 4: ABOUT US ===
+# === TAB 4: ABOUT ===
 with tab4:
-    st.markdown(f"""<div class="hero-container"><div class="hero-title">{text['hero_title']}</div><div class="hero-subtitle">{text['hero_subtitle']}</div><div class="hero-text">{text['hero_desc']}</div></div>""", unsafe_allow_html=True)
-    st.subheader(text['services_main_title'])
-    col1, col2, col3 = st.columns(3)
-    with col1: st.markdown(f"""<div class="service-card"><div class="service-icon">🏡</div><div class="service-title">{text['s1_t']}</div><div class="service-desc">{text['s1_d']}</div></div>""", unsafe_allow_html=True)
-    with col2: st.markdown(f"""<div class="service-card"><div class="service-icon">📐</div><div class="service-title">{text['s2_t']}</div><div class="service-desc">{text['s2_d']}</div></div>""", unsafe_allow_html=True)
-    with col3: st.markdown(f"""<div class="service-card"><div class="service-icon">🏗️</div><div class="service-title">{text['s3_t']}</div><div class="service-desc">{text['s3_d']}</div></div>""", unsafe_allow_html=True)
-    st.write("") 
-    col4, col5, col6 = st.columns(3)
-    with col4: st.markdown(f"""<div class="service-card"><div class="service-icon">🤝</div><div class="service-title">{text['s4_t']}</div><div class="service-desc">{text['s4_d']}</div></div>""", unsafe_allow_html=True)
-    with col5: st.markdown(f"""<div class="service-card"><div class="service-icon">⚡</div><div class="service-title">{text['s5_t']}</div><div class="service-desc">{text['s5_d']}</div></div>""", unsafe_allow_html=True)
-    with col6: st.markdown(f"""<div class="service-card"><div class="service-icon">🏨</div><div class="service-title">{text['s6_t']}</div><div class="service-desc">{text['s6_d']}</div></div>""", unsafe_allow_html=True)
-    st.divider()
-    st.markdown(f"""<div style="text-align: center; margin-top: 30px;"><a href="https://www.giakoumakis.gr" target="_blank" style="background-color: #0088C3; color: white; padding: 16px 40px; text-align: center; text-decoration: none; display: inline-block; font-size: 18px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 15px rgba(0, 136, 195, 0.4); transition: all 0.3s ease;">{text['visit_button']} 🌐</a></div>""", unsafe_allow_html=True)
+    st.markdown(f"""<div class="hero-container"><div class="hero-title">{t['about']['hero_t']}</div><div class="hero-subtitle">{t['about']['hero_s']}</div><div class="hero-text">{t['about']['hero_d']}</div></div>""", unsafe_allow_html=True)
+    
+    cols = st.columns(3) + st.columns(3)
+    icons = ["🏡", "📐", "🏗️", "🤝", "⚡", "🏨"]
+    for i, col in enumerate(cols):
+        col.markdown(f"""<div class="service-card"><div class="service-icon">{icons[i]}</div><div class="service-title">{t['about']['srv'][i*2]}</div><div class="service-desc">{t['about']['srv'][i*2+1]}</div></div>""", unsafe_allow_html=True)
+        
+    st.markdown(f"""<div style="text-align: center; margin-top: 30px;"><a href="https://www.giakoumakis.gr" target="_blank" style="background-color: #0088C3; color: white; padding: 16px 40px; text-decoration: none; border-radius: 50px; font-weight: bold;">{t['about']['btn']} 🌐</a></div>""", unsafe_allow_html=True)
 
 # --- FOOTER ---
 st.markdown("---")
-st.markdown(f"<div style='text-align: center; color: grey; font-size: 0.8rem;'>{text['footer']}</div>", unsafe_allow_html=True)
+st.markdown(f"<div style='text-align: center; color: grey;'>{t['about']['foot']}</div>", unsafe_allow_html=True)
